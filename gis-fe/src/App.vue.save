@@ -1,0 +1,103 @@
+<template>
+  <div class='header-container'>
+    <button id="logo-perumahan" @click="navigate('/')" class="btn rounded-circle logo" title="Rumah Jakarta">
+      <img src="/logo-perumahan.svg" class="icon" alt="Logo"></img>
+    </button>
+//    <span class='title-container'>Rumah Jakarta</span>//
+  </div>
+  <!-- <div class="footer-container">
+    <button 
+      v-for="logo in logos" 
+      :key="logo.id" 
+      :class="['btn', 'rounded-circle', 'logo']" 
+      @click="navigate(logo.link)"
+      :title="logo.title">
+      <img :src="logo.src" :class="logo.iconClass" alt="Logo"></img>
+    </button>
+  </div> -->
+
+  <div id="app">
+    <MapApp />
+  </div>
+</template>
+
+<script setup>
+import { reactive } from 'vue';
+import MapApp from './components/MapApp.vue';
+// import cswIcon from './assets/logo-csw.png';
+// import geoserverIcon from './assets/logo-geoserver.png';
+
+// const logos = reactive([
+//   { id: 'logo-csw', src: cswIcon, link: '/csw', iconClass: 'icon', title: 'pyCSW'},
+//   { id: 'logo-geoserver', src: geoserverIcon, link: '/kemenhub', iconClass: 'icon', title: 'Geoserver'}
+// ]);
+
+const navigate = (url) => {
+  location.href = url;
+};
+</script>
+
+<style>
+.header-container {
+  display: flex;
+  position: absolute;
+  align-items: center;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+  transition: all 500ms ease-out;
+  overflow: hidden;
+}
+
+.footer-container {
+  display: flex;
+  position: absolute;
+  z-index: 1;
+  bottom: 10px;
+  right: 10px;
+}
+
+#logo-perumahan {
+  margin-left: 0px;
+  z-index: 2;
+}
+
+.title-container {
+  background-color: rgba(255,255,255,0.82);
+  font-size: 20px;
+  border-radius: 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  color: darkslateblue;
+  padding: 3px 15px 3px 30px;
+  margin-left: -20px;
+  box-shadow: 5px 5px 5px rgba(0,0,0,0.1);
+}
+
+/* .btn i {
+  color: darkslateblue;
+} */
+
+.btn.logo,
+.btn.logo:active:focus {
+  background-color: white;
+  margin-left: 10px;
+  width: 40px; 
+  height: 40px;
+  border: 2px solid transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 5px 5px 5px rgba(0,0,0,0.1);
+}
+
+.btn.logo:hover {
+  background-color: white;
+  border-color: slateblue;
+  transition: all 500ms;
+}
+
+.icon {
+  height: 25px;
+}
+</style>

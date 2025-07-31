@@ -1,0 +1,210 @@
+/* === TABEL MODERN TANPA GARIS === */
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  background-color: white;
+  table-layout: auto;
+  word-break: break-word;
+}
+
+.table thead th {
+  border-bottom: 2px solid #dee2e6;
+  border-left: none !important;
+  border-right: none !important;
+  background-color: #f8f9fa;
+  font-weight: bold;
+  padding: 12px;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+.table tbody tr {
+  background-color: white !important;
+  border: none !important;
+}
+
+.table tbody td {
+  border: none !important;
+  padding: 12px;
+}
+
+.table td,
+.table th {
+  vertical-align: middle;
+  text-align: center;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #e9f5ff !important;
+  cursor: pointer;
+}
+
+.table-hover tbody td:hover {
+  background-color: #d0ebff !important;
+  transition: background-color 0.2s ease;
+  color: #000;
+}
+
+/* === WRAPPER RESPONSIF TABEL === */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* === TOMBOL EXPORT CUSTOM === */
+#customExportButtons {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+#customExportButtons img {
+  border: 1px solid #ccc;
+  padding: 4px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: none;
+  transition: transform 0.2s ease;
+  width: 36px;
+  height: 36px;
+}
+
+#customExportButtons img:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+.btn-export {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-export:hover {
+  background-color: #f0f0f0;
+}
+
+/* === SEMBUNYIKAN SEARCH BAWAAN DATATABLE === */
+.dataTables_filter {
+  display: none !important;
+}
+
+/* === CUSTOM SEARCH STYLING === */
+.custom-search-box {
+  position: relative;
+  width: 300px;
+  margin-bottom: 1rem;
+}
+
+.custom-search-box .search-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  z-index: 2;
+  color: #666;
+}
+
+.custom-search-box input.form-control {
+  padding-left: 40px;
+  border-radius: 25px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ccc;
+  height: 38px;
+}
+
+/* === PAGINATION TENGAH === */
+.dataTables_wrapper .dataTables_paginate {
+  display: flex;
+  justify-content: center !important;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* === PAGINATION STYLING === */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  background-color: #f8f9fa !important;
+  color: #212529 !important;
+  border: 1px solid #dee2e6 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background-color: #e9ecef !important;
+  color: #212529 !important;
+  border: 1px solid #ced4da !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background-color: #007bff !important;
+  color: white !important;
+  border: 1px solid #007bff !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background-color: #339af0 !important;
+  border-color: #339af0 !important;
+}
+
+/* === RESPONSIVE ADJUSTMENT === */
+@media (max-width: 768px) {
+  .custom-search-box {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  #customExportButtons {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .table thead th,
+  .table tbody td {
+    font-size: 0.85rem;
+    padding: 8px;
+  }
+
+  .dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 5px 10px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .custom-search-box input.form-control {
+    height: 34px;
+    font-size: 0.9rem;
+  }
+
+  .custom-search-box .search-icon {
+    font-size: 1rem;
+    left: 10px;
+  }
+
+  #customExportButtons img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+}
