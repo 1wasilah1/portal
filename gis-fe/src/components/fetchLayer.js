@@ -19,7 +19,18 @@ const layerDefinitions = [
   // { name: 'RTLH', title: 'RTLH' },
   { name: 'aset', title: 'Aset DPRKP Jakarta' },
   // { name: 'admin_jkt', title: 'Administrasi Jakarta' } // Tambahkan layer HTM
-  { name: 'CIP_APAR', title: 'Hunian Terjangkau Milik' },
+  { name: 'cippsu', title: 'Bangunan PSU' },
+  { name: 'cipdll', title: 'Drainase Lingkungan (Garis)' },
+  { name: 'cipdlp', title: 'Drainase Lingkungan (Titik)' },
+  { name: 'cipjl', title: 'Jalan Lingkungan' },
+  { name: 'cippk', title: 'Pencegahan Kebakaran' },
+  { name: 'cippd', title: 'Pendukung Dekorasi' },
+  { name: 'cippkdkk', title: 'Pendukung Keamanan dan Keselamatan Kawasan' },
+  { name: 'cippju', title: 'Penerangan Jalan Umum' },
+  { name: 'cippj', title: 'Penghijauan' },
+  { name: 'cipsl', title: 'Sarpras Lainnya' },
+  { name: 'caplm', title: 'CAP Line Menteng' },
+  { name: 'cappt', title: 'CAP Point Menteng' }
 ];
 
 // Layer group untuk base dan overlay
@@ -30,7 +41,7 @@ const baseLayerGroup = new LayerGroup({
       title: 'CartoDB Positron',
       type: 'base',
       subtype: 'always-on', // membuat layer ini selalu aktif
-      visible: true,
+      visible: false,
       source: new XYZ({
         url: 'https://{a-c}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
       })
@@ -45,7 +56,7 @@ const baseLayerGroup = new LayerGroup({
       title: 'ESRI Satellite',
       source: new XYZ({ url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}' }),
       type: 'base',
-      visible: false
+      visible: true
     }),
     new TileLayer({ // ✅ Citra DKI 2023 (langsung dari GeoServer)
       title: 'Citra DKI 2023',
@@ -82,7 +93,19 @@ const colorMap = {
   rptra: '#e377c2',
   aset: '#7f7f7f',
   // RTLH: '#e377c2',
-  htm: '#7f7f7f'
+  htm: '#7f7f7f',
+  cippsu: '#17becf',
+  cipdll: '#1f77b4',
+  cipdlp: '#ff7f0e',
+  cipjl: '#2ca02c',
+  cippk: '#d62728',
+  cippd: '#9467bd',
+  cippkdkk: '#8c564b',
+  cippju: '#e377c2',
+  cippj: '#7f7f7f',
+  cipsl: '#17becf',
+  caplm: '#1f77b4',
+  cappt: '#ff7f0e'
 };
 
 const fetchLayer = async () => {
@@ -94,7 +117,8 @@ const fetchLayer = async () => {
         title: def.title,
         source: new VectorSource({
           format: new GeoJSON(),
-          url: `${apiBase}/api/geojson-public/public/${def.name}?token=${import.meta.env.VITE_PUBLIC_GEOJSON_TOKEN}`,
+          url: `${apiBase}/api/geojson-public/public/${def.name}`,
+          // url: `${apiBase}/api/geojson-public/public/${def.name}?token=${import.meta.env.VITE_PUBLIC_GEOJSON_TOKEN}`,
         }),
         style: new Style({
           stroke: new Stroke({ color, width: 2 }),

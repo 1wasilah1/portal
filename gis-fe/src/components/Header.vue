@@ -1,24 +1,31 @@
+<script setup>
+const navigate = (url) => window.open(url, '_blank');
+</script>
+
 <template>
   <div class="header-container">
     <!-- Kiri: Logo + Judul -->
     <div class="header-left">
       <button @click="navigate('/')" class="logo-button">
-        <img src="/rumahjakarta.svg" class="logo-image" />
+        <img src="/Sigap07.svg" class="logo-image" />
       </button>
-      <span class="title-text">SIGAP Kumuh</span>
+      <span class="title-text">SIGAP KUMUH</span>
     </div>
 
-    <!-- Kanan: Dashboard -->
-    <div class="dashboard-flat" @click="navigate('/dashboard')">
-      <i class="fas fa-tachometer-alt"></i>
-      <span class="dashboard-label">Dashboard</span>
+    <!-- Kanan: Dashboard dan Beranda -->
+    <div class="nav-buttons">
+      <div class="beranda-flat" @click="navigate('https://10.15.38.162:3100/web/sigapkumuh')" title="Beranda">
+        <i class="fas fa-home"></i>
+        <span class="beranda-label">Beranda</span>
+      </div>
+
+      <div class="dashboard-flat" @click="navigate('http://10.15.38.162:5500')" title="Dashboard">
+        <i class="fas fa-tachometer-alt"></i>
+        <span class="dashboard-label">Dashboard</span>
+      </div>
     </div>
   </div>
 </template>
-
-<script setup>
-const navigate = (url) => location.href = url;
-</script>
 
 <style scoped>
 .header-container {
@@ -67,7 +74,13 @@ const navigate = (url) => location.href = url;
   color: #0ea5e9;
 }
 
-/* Dashboard */
+/* navbar dashbaord dan beranda */
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .dashboard-flat {
   display: flex;
   align-items: center;
@@ -76,7 +89,7 @@ const navigate = (url) => location.href = url;
   border-radius: 9999px;
   font-size: 1.3125rem; /* ~21px */
   cursor: pointer;
-  color: #0f172a;
+  color: #35b4ed;
   background-color: transparent;
   transition: background-color 0.3s ease;
 }
@@ -89,9 +102,34 @@ const navigate = (url) => location.href = url;
   display: none;
 }
 
+.beranda-flat {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 1.3125rem; /* ~21px */
+  cursor: pointer;
+  color: #35b4ed;
+  background-color: transparent;
+  transition: background-color 0.3s ease;
+}
+
+.beranda-flat:hover {
+  background-color: rgba(14, 165, 233, 0.1);
+}
+
+.beranda-label {
+  display: none;
+}
+
 @media (min-width: 480px) {
   .dashboard-label {
     display: inline;
   }
+  .beranda-label {
+    display: inline;
+  }
 }
+
 </style>

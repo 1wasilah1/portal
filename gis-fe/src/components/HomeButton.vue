@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
-import Control from 'ol/control/Control';
+import Control from 'ol/control/Control.js';
 import { fromLonLat } from 'ol/proj';
 
 const props = defineProps({
@@ -44,13 +44,13 @@ onMounted(() => {
 .myButton {
   background-color: white;
   background-image: url('../assets/home.svg');
-  height: 40px;
-  width: 40px;
+  height: 50px;
+  width: 50px;
   /* border-radius: 100%; */
   border: 2px solid transparent;
   background-position: center;
   background-repeat: no-repeat;
-  background-size: 20px 20px;
+  background-size: 30px 30px;
   cursor: pointer;
 }
 

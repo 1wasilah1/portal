@@ -61,14 +61,14 @@ const geoLimiter = rateLimit({
   message: 'Too many requests, please slow down',
 });
 
-// 🛡️ Token checker (simple)
-const checkPublicToken = (req, res, next) => {
-  const token = req.query.token;
-  if (token !== process.env.PUBLIC_GEOJSON_TOKEN) {
-    return res.status(403).json({ error: 'Invalid or missing token' });
-  }
-  next();
-};
+// // 🛡️ Token checker (simple)
+// const checkPublicToken = (req, res, next) => {
+//   const token = req.query.token;
+//   if (token !== process.env.PUBLIC_GEOJSON_TOKEN) {
+//     return res.status(403).json({ error: 'Invalid or missing token' });
+//   }
+//   next();
+// };
 
 // 📦 Function ambil data GeoJSON
 async function getGeoJSON(schema, table) {
@@ -89,7 +89,9 @@ async function getGeoJSON(schema, table) {
 }
 
 // 📍 Endpoint Public, Dilindungi
-router.get('/geojson-public/:schema/:alias', geoLimiter, checkPublicToken, async (req, res) => {
+router.get('/geojson-public/:schema/:alias', geoLimiter, 
+  // checkPublicToken,
+   async (req, res) => {
   const { schema, alias } = req.params;
 
   if (!allowedSchemas.includes(schema)) {

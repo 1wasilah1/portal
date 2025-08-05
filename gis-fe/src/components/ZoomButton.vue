@@ -29,34 +29,47 @@ onMounted(() => {
 <style scoped>
 .custom-zoom-control {
   position: absolute;
-  top: 14vh;         /* ubah sesuai kebutuhan */
-  right: 4vw;
-  z-index: 9999;
+  top: 100px;         /* ubah sesuai kebutuhan */
+  right: 60px;
+  z-index: 1000;
   pointer-events: auto;
 }
 
 /* Styling tombol zoom */
 .ol-zoom {
-  background-color: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(4px);
-  border-radius: 8px;
-  padding: 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 100px;
+  right: 60px;
+  left: auto;
+  display: flex;             /* aktifkan flexbox */
+  flex-direction: row;       /* arah horizontal */
+  gap: 10px;                 /* jarak antar tombol 10px */
+  background-color: transparent;
+  transition: all 500ms ease-out;
+  z-index: 1000;
+  padding: 0;
+  margin: 0;
 }
 
-.ol-zoom button {
-  width: clamp(24px, 6vw, 36px);
-  height: clamp(24px, 6vw, 36px);
-  font-size: 1.2rem;
-  border-radius: 50%;
+.ol-zoom .ol-zoom-in,
+.ol-zoom .ol-zoom-out {
+  width: 50px;               /* ukuran tombol 50px */
+  height: 50px;
+  font-size: 1.5rem;
+  border-radius: 25%;
   border: 2px solid transparent;
-  margin-bottom: 6px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.3s ease;
+  background-color: white;
+  color: #333;
 }
 
 .ol-zoom button:hover {
   border-color: slateblue;
+  transition: all 500ms;
 }
 
 @media (max-width: 768px) {
@@ -66,9 +79,15 @@ onMounted(() => {
     right: 1rem;
   }
 
+  .ol-zoom {
+    gap: 10px;               /* tetap 10px di mobile */
+  }
+  
   .ol-zoom button {
-    width: 36px;
-    height: 36px;
+    width: 50px;
+    height: 50px;
+    transition: all 500ms;
+    cursor: pointer;
   }
 }
 </style>

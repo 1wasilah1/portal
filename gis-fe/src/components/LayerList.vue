@@ -131,7 +131,7 @@ onMounted(() => {
 .layer-list {
   position: absolute;
   z-index: 2;
-  top: 60px;
+  top: 110px;
   left: 60px;
   width: 380px;
   max-height: 70%;
