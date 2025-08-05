@@ -8,8 +8,7 @@
           <h4>{{ popupData.layerName }}</h4>
         </div>
         <div class="popup-body" style="text-align: left">
-          <p><strong>ID:</strong> {{ popupData.id }}</p>
-          <p><strong>Nama:</strong> {{ popupData.nama }}</p>
+          <p><strong>Alamat:</strong> {{ popupData.alamat }}</p>
           <p><strong>Keterangan:</strong> {{ popupData.keterangan }}</p>
           <img v-if="popupData.foto" :src="popupData.foto" alt="foto" class="popup-image" />
         </div>
@@ -75,6 +74,7 @@ const closePopup = () => {
   popupOverlay?.setPosition(undefined);
   popupData.value = null;
   isSlideOpen.value = false;
+  highlightSource.clear();
 };
 
 const openSlide = () => {
@@ -146,9 +146,8 @@ onMounted(() => {
 
     popupData.value = {
       layerName: selected.layer?.get('title') || '',
-      id: propsF.id || '-',
-      nama: propsF.nama || propsF.name || propsF.namobj || propsF.namaobj || propsF.NAMAOBJ || propsF.KIB || '-',
-      keterangan: propsF.keterangan || propsF.deskripsi || propsF.symbology || '-',
+      alamat: propsF.alamat || propsF.Alamat || propsF.Kelurahan || '-',
+      keterangan: propsF.keterangan || propsF.Keterangan || propsF.deskripsi || propsF.symbology || '-',
       foto: propsF.foto || propsF.image || null
     };
 
@@ -211,7 +210,7 @@ onMounted(() => {
   background: white;
   border-left: 1px solid #ccc;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
-  z-index: 999;
+  z-index: 1001;
 }
 .slide-header {
   padding: 12px;

@@ -15,7 +15,7 @@ export default defineConfig({
     },
     proxy: {
       '/api/peta': {
-        target: 'http://10.15.38.162:92000/api', // Ganti dengan URL backend Anda
+        target: 'http://10.15.38.162:9200/api', // Ganti dengan URL backend Anda
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       },

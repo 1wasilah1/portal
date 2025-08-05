@@ -109,12 +109,15 @@ export default {
 <style scoped>
 .fullscreen-toggle {
   position: absolute;
-  top: 26vh;
-  right: 1vw;
+  top: 105px;
+  right: 120px;
   z-index: 1000;
   background: white;
   border: 2px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px;
+  color: #c2c1c0;
+  width: 50px;              /* ✅ lebar tetap */
+  height: 50px;             /* ✅ tinggi tetap */
   padding: 6px;
   cursor: pointer;
   display: flex;
@@ -124,14 +127,15 @@ export default {
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
 }
 
+
 .fullscreen-toggle:hover {
   background: #f5f5f5;
   border-color: rgba(0, 0, 0, 0.3);
 }
 
 .fullscreen-toggle svg {
-  width: 20px;
-  height: 20px;
+  width: 30px;
+  height: 30px;
 }
 
 .fullscreen-toggle.is-fullscreen {

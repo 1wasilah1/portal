@@ -44,6 +44,11 @@ app.get('/health', (req, res) => {
 app.use('/login', authRoutes);
 app.use('/login', adminAuthRoutes);
 
+//redirect
+app.get('/gis/peta', (req, res) => {
+  res.redirect(301, '/gis/peta/');
+});
+
 // Proxy untuk static files portal (tanpa path rewrite) - HARUS DULUAN
 app.use('/static', createProxyMiddleware({
     target: 'http://localhost:3000/static', // Portaldata-fe running on port 3000
@@ -98,19 +103,19 @@ app.use('/portal-be', createProxyMiddleware({
 }));
 
 // Redirect /peta to /gis/peta
-app.use('/peta', (req, res) => {
-    const newUrl = `/gis/peta${req.url}`;
-    console.log(`Redirecting ${req.url} to ${newUrl}`);
-    res.redirect(newUrl);
-});
+// app.use('/peta', (req, res) => {
+//     const newUrl = `/gis/peta${req.url}`;
+//     console.log(`Redirecting ${req.url} to ${newUrl}`);
+//     res.redirect(newUrl);
+// });
 
 // Proxy untuk GIS service (termasuk static files)
-app.use('/gis', createProxyMiddleware({
+app.use('/gis/peta', createProxyMiddleware({
     target: 'http://localhost:9100', // GIS service running on port 9100
     changeOrigin: true,
     secure: false,
     pathRewrite: {
-        '^/gis': '/peta', // Redirect /gis to /peta in backend
+        '^/gis/peta': '', // Redirect /gis to /peta in backend
     },
     onError: (err, req, res) => {
         console.error('Proxy error for /gis:', err.message);
