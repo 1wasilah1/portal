@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import HeroSection from './components/HeroSection';
 import BarChartCard from './components/BarChartCard';
 import DonutChartCard from './components/DonutChartCard';
+import TreemapChartCard from './components/TreemapChartCard';
 import TableDetailCard from './components/TableDetailCard';
 import AllDataTable from './components/AllDataTable';
 import FilterPanel from './components/FilterPanel';
@@ -250,13 +251,13 @@ function App() {
             <BarChartCard title="CAP dan CIP berdasarkan RW Kumuh" filters={filters} data={barChartData} />
           </div>
           <div className="col-md-6">
-            <DonutChartCard title="Persentase Anggaran CAP" filters={filters} data={donutCapData} />
+            <TreemapChartCard title="Treemap Anggaran CAP" filters={filters} data={donutCapData} />
           </div>
           <div className="col-md-6">
             <TableDetailCard title="Detail CIP" filters={filters} data={tableCipData} /> {/* ✅ Update */}
           </div>
           <div className="col-md-6">
-            <DonutChartCard title="Persentase Anggaran CIP" filters={filters} data={donutCipData} />
+              <TreemapChartCard title="Treemap Anggaran CIP" filters={filters} data={donutCipData} />
           </div>
           <div className="col-md-12">
             <AllDataTable filters={filters} data={tableCipData} /> {/* ✅ Update */}

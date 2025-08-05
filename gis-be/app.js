@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const pool = require('./db');
 const geoRoutes = require('./routes/geo');
+const batasAdminRoutes = require('./routes/batasAdmin');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api', geoRoutes);
+app.use('/api/admin', batasAdminRoutes);
 
 // Login route
 app.post('/login', async (req, res) => {

@@ -1,0 +1,1 @@
+- belum setting foto

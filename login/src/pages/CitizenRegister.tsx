@@ -104,49 +104,149 @@ export const CitizenRegister = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(registerForm.email)) {
       toast({
-        title: "Registrasi Berhasil",
-        description: "Akun Anda telah dibuat. Silakan login untuk melanjutkan.",
+        title: "Format Email Salah",
+        description: "Mohon masukkan format email yang valid",
+        variant: "destructive"
       });
       setIsLoading(false);
-      // Reset form and switch to login tab
-      setRegisterForm({ name: '', email: '', phone: '', address: '' });
-    }, 1000);
+      return;
+    }
+
+    // Validate phone number format (Indonesian)
+    const phoneRegex = /^(\+62|62|0)8[1-9][0-9]{6,9}$/;
+    if (!phoneRegex.test(registerForm.phone)) {
+      toast({
+        title: "Format Nomor HP Salah",
+        description: "Mohon masukkan nomor HP dengan format yang benar (contoh: 081234567890)",
+        variant: "destructive"
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('https://localhost:9200/login/citizen/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: registerForm.email,
+          nama: registerForm.name,
+          no_hp: registerForm.phone,
+          alamat: registerForm.address
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Save token to localStorage
+        localStorage.setItem('userToken', data.token);
+        localStorage.setItem('userEmail', data.user.email);
+        localStorage.setItem('userData', JSON.stringify(data.user));
+        
+        toast({
+          title: "Registrasi Berhasil",
+          description: "Akun Anda telah dibuat. Silakan login untuk melanjutkan.",
+        });
+        
+        // Reset form and switch to login tab
+        setRegisterForm({ name: '', email: '', phone: '', address: '' });
+      } else {
+        toast({
+          title: "Registrasi Gagal",
+          description: data.error || "Terjadi kesalahan saat mendaftar",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast({
+        title: "Registrasi Gagal",
+        description: "Terjadi kesalahan pada server",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      // Save user email to localStorage
-      localStorage.setItem('userEmail', loginForm.email);
-      
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(loginForm.email)) {
       toast({
-        title: "Login Berhasil",
-        description: "Selamat datang! Anda dapat mulai mengajukan saran.",
+        title: "Format Email Salah",
+        description: "Mohon masukkan format email yang valid",
+        variant: "destructive"
       });
-      
-      // Check if coordinates exist in localStorage
-      const storedCoordinates = localStorage.getItem('coordinates');
-      if (storedCoordinates) {
-        try {
-          const coordData = JSON.parse(storedCoordinates);
-          setCoordinates(coordData);
-          setShowLocationModal(true);
-        } catch (error) {
-          console.error('Error parsing coordinates:', error);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('https://localhost:9200/login/citizen/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: loginForm.email
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Save token and user data to localStorage
+        localStorage.setItem('userToken', data.token);
+        localStorage.setItem('userEmail', data.user.email);
+        localStorage.setItem('userData', JSON.stringify(data.user));
+        
+        toast({
+          title: "Login Berhasil",
+          description: "Selamat datang! Anda dapat mulai mengajukan saran.",
+        });
+        
+        // Check if coordinates exist in localStorage
+        const storedCoordinates = localStorage.getItem('coordinates');
+        if (storedCoordinates) {
+          try {
+            const coordData = JSON.parse(storedCoordinates);
+            setCoordinates(coordData);
+            setShowLocationModal(true);
+          } catch (error) {
+            console.error('Error parsing coordinates:', error);
+            navigate('/citizen/progress');
+          }
+        } else {
           navigate('/citizen/progress');
         }
       } else {
-        navigate('/citizen/progress');
+        toast({
+          title: "Login Gagal",
+          description: data.error || "Email tidak terdaftar",
+          variant: "destructive"
+        });
       }
-      
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: "Login Gagal",
+        description: "Terjadi kesalahan pada server",
+        variant: "destructive"
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -193,6 +293,7 @@ export const CitizenRegister = () => {
                   placeholder="contoh@email.com"
                   required
                 />
+                <p className="text-xs text-muted-foreground">Format: contoh@email.com</p>
                 
                 <InputField
                   label="Nomor HP"
@@ -200,9 +301,10 @@ export const CitizenRegister = () => {
                   value={registerForm.phone}
                   onChange={(e) => setRegisterForm(prev => ({ ...prev, phone: e.target.value }))}
                   icon={<Phone className="w-4 h-4" />}
-                  placeholder="08xxxxxxxxxx"
+                  placeholder="081234567890"
                   required
                 />
+                <p className="text-xs text-muted-foreground">Format: 081234567890</p>
                 
                 <InputField
                   label="Alamat"
