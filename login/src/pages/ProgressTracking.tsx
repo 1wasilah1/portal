@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { InputField } from '@/components/ui/input-field';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { logout } from '@/utils/auth';
+import { Header } from '@/components/Header';
 
 const mockSubmissions = [
   {
@@ -167,47 +169,28 @@ export const ProgressTracking = () => {
   };
 
   const handleLogout = () => {
-    // Clear user data from localStorage
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('coordinates');
-    
+    logout(navigate);
     toast({
       title: "Logout Berhasil",
       description: "Terima kasih telah menggunakan sistem kami",
     });
-    navigate('/login/citizen/register');
   };
 
   return (
     <DashboardLayout>
       <div className="space-y-6 animate-fade-in">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Progress Pengajuan</h1>
-            <p className="text-muted-foreground mt-1">
-              Pantau status pengajuan saran Anda
-              {userEmail && (
-                <span className="block text-sm text-blue-600">
-                  Login sebagai: {userEmail}
-                </span>
-              )}
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Button variant="success" onClick={handleNewSubmission}>
-              <PlusCircle className="w-4 h-4 mr-2" />
-              Ajukan Saran Baru
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/')}>
-              <Home className="w-4 h-4 mr-2" />
-              Beranda
-            </Button>
-            <Button variant="ghost" onClick={handleLogout}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
+        <Header 
+          title="Progress Pengajuan"
+          subtitle="Pantau status pengajuan saran Anda"
+          showHomeButton={false}
+        />
+        
+        <div className="flex justify-end mb-6">
+          <Button variant="success" onClick={handleNewSubmission}>
+            <PlusCircle className="w-4 h-4 mr-2" />
+            Ajukan Saran Baru
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

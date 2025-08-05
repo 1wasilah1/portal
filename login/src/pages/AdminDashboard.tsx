@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -109,8 +109,198 @@ const mockCitizens = [
 export const AdminDashboard = () => {
   const [suggestions, setSuggestions] = useState(mockSuggestions);
   const [citizens, setCitizens] = useState(mockCitizens);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [adminData, setAdminData] = useState(null);
+  const [cookieStatus, setCookieStatus] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Function to check and display cookie status
+  const checkCookieStatus = () => {
+    const cookies = document.cookie;
+    const hasAccessToken = cookies.includes('accessToken');
+    const hasRefreshToken = cookies.includes('refreshToken');
+    const userData = localStorage.getItem('userData');
+    
+    const status = {
+      hasAccessToken,
+      hasRefreshToken,
+      hasUserData: !!userData,
+      allCookies: cookies,
+      cookieCount: cookies.split(';').length,
+      authenticationType: hasAccessToken && hasRefreshToken ? 'Admin Suku Dinas' : 
+                         userData ? 'User Eksternal' : 'Akses Public'
+    };
+    
+    console.log('Cookie Status:', status);
+    setCookieStatus(JSON.stringify(status, null, 2));
+    
+    toast({
+      title: "Status Autentikasi",
+      description: `Tipe: ${status.authenticationType} | AccessToken: ${hasAccessToken ? '✓' : '✗'} | RefreshToken: ${hasRefreshToken ? '✓' : '✗'} | UserData: ${userData ? '✓' : '✗'}`,
+    });
+  };
+
+  // Test functions for different authentication states
+  const simulateAdminLogin = () => {
+    // Simulate admin login with HTTP-only cookies
+    document.cookie = 'accessToken=test_admin_token; path=/; max-age=86400';
+    document.cookie = 'refreshToken=test_refresh_token; path=/; max-age=86400';
+    localStorage.removeItem('userData');
+    toast({
+      title: "Simulasi Admin",
+      description: "Status admin suku dinas telah disimulasikan",
+      className: "bg-blue-500 text-white",
+    });
+    window.location.reload();
+  };
+
+  const simulateExternalUser = () => {
+    // Simulate external user with localStorage
+    document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    document.cookie = 'refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    localStorage.setItem('userData', JSON.stringify({ name: 'External User', email: 'external@example.com' }));
+    toast({
+      title: "Simulasi Eksternal",
+      description: "Status user eksternal telah disimulasikan",
+      className: "bg-green-500 text-white",
+    });
+    window.location.reload();
+  };
+
+  const simulatePublicUser = () => {
+    // Simulate public user - no authentication
+    document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    document.cookie = 'refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    localStorage.removeItem('userData');
+    toast({
+      title: "Simulasi Public",
+      description: "Status akses public telah disimulasikan",
+      className: "bg-orange-500 text-white",
+    });
+    window.location.reload();
+  };
+
+  // Test toast function
+  const testToast = () => {
+    console.log('Test toast triggered');
+    toast({
+      title: "Test Toast Berhasil!",
+      description: "Ini adalah test toast untuk memverifikasi sistem toast berfungsi dengan baik",
+      variant: "default",
+      duration: 5000, // 5 seconds
+    });
+  };
+
+  // Verify admin authentication on component mount
+  useEffect(() => {
+    const verifyAdminAuth = async () => {
+      try {
+        // Test toast to verify toast system is working
+        toast({
+          title: "Dashboard Loaded",
+          description: "Memverifikasi status autentikasi...",
+        });
+        
+        // Check for different authentication types
+        const cookies = document.cookie;
+        const hasAccessToken = cookies.includes('accessToken');
+        const hasRefreshToken = cookies.includes('refreshToken');
+        const userData = localStorage.getItem('userData');
+        
+        console.log('Auth check:', { hasAccessToken, hasRefreshToken, userData: !!userData });
+        
+        // Determine authentication type and show appropriate toast
+        if (hasAccessToken && hasRefreshToken) {
+          // Admin suku dinas - HTTP-only cookies present
+          console.log('Showing admin toast');
+          console.log('🔵 ALERT: Admin Suku Dinas detected!');
+          toast({
+            title: "Admin Suku Dinas",
+            description: "Anda login sebagai admin suku dinas dengan HTTP-only cookies",
+            className: "bg-blue-500 text-white",
+          });
+          
+          // Verify admin authentication
+          const response = await fetch('/login/admin/profile', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setAdminData(data.data);
+            console.log('Admin authenticated:', data.data);
+          } else {
+            console.log('Admin not authenticated, redirecting to login');
+            toast({
+              title: "Akses Ditolak",
+              description: "Silakan login terlebih dahulu",
+              variant: "destructive",
+            });
+            navigate('/admin/login');
+            return;
+          }
+        } else if (userData) {
+          // Eksternal user - localStorage userData present
+          console.log('Showing external user toast');
+          console.log('🟢 ALERT: User Eksternal detected!');
+          toast({
+            title: "User Eksternal",
+            description: "Anda login sebagai user eksternal",
+            className: "bg-green-500 text-white",
+          });
+          
+          // For external users, we don't need to verify with admin API
+          setAdminData({ username: 'external_user', role: 'external' });
+        } else {
+          // Public user - no authentication
+          console.log('Showing public user toast');
+          console.log('🟠 ALERT: Akses Public detected!');
+          toast({
+            title: "Akses Public",
+            description: "Anda mengakses sebagai user public",
+            className: "bg-orange-500 text-white",
+          });
+          
+          // For public users, we don't need to verify with admin API
+          setAdminData({ username: 'public_user', role: 'public' });
+        }
+      } catch (error) {
+        console.error('Auth verification error:', error);
+        toast({
+          title: "Error Verifikasi",
+          description: "Terjadi kesalahan saat verifikasi autentikasi",
+          variant: "destructive",
+        });
+        navigate('/admin/login');
+        return;
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Show test toast after a delay
+    const testToastTimer = setTimeout(() => {
+      console.log('Component mounted, showing test toast');
+      toast({
+        title: "🚀 Toast System Test",
+        description: "Jika Anda melihat toast ini, sistem toast berfungsi dengan baik!",
+        duration: 10000, // 10 seconds
+      });
+    }, 500);
+
+    verifyAdminAuth();
+
+    // Cleanup timer
+    return () => {
+      clearTimeout(testToastTimer);
+    };
+  }, [navigate, toast]);
 
   const handleApprove = (id: string) => {
     setSuggestions(prev => 
@@ -151,11 +341,50 @@ export const AdminDashboard = () => {
     });
   };
 
-  const handleLogout = () => {
-    toast({
-      title: "Logout Berhasil",
-      description: "Anda telah keluar dari sistem admin",
-    });
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    
+    try {
+      // Call proxy server logout endpoint
+      const response = await fetch('/login/admin/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include' // Include cookies
+      });
+
+      if (response.ok) {
+        console.log('Admin logout successful');
+        toast({
+          title: "Logout Berhasil",
+          description: "Anda telah keluar dari sistem admin",
+        });
+      } else {
+        console.log('Admin logout failed:', response.status);
+        toast({
+          title: "Logout Warning",
+          description: "Logout gagal, tetapi session lokal telah dibersihkan",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Admin logout error:', error);
+      toast({
+        title: "Logout Warning",
+        description: "Terjadi kesalahan saat logout, tetapi session lokal telah dibersihkan",
+        variant: "destructive",
+      });
+    }
+
+    // Clear all localStorage and cookies
+    localStorage.clear();
+    document.cookie = 'refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    document.cookie = 'admin_login=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    document.cookie = 'admin_login_time=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+
+    // Redirect to login page
     navigate('/admin/login');
   };
 
@@ -194,6 +423,20 @@ export const AdminDashboard = () => {
     activeCitizens: citizens.filter(c => c.status === 'active').length
   };
 
+  // Show loading state while verifying authentication
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Memverifikasi autentikasi...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-6 animate-fade-in">
@@ -202,11 +445,50 @@ export const AdminDashboard = () => {
           <div>
             <h1 className="text-3xl font-bold text-foreground">Dashboard Admin</h1>
             <p className="text-muted-foreground mt-1">Kelola pengajuan saran dan data warga</p>
+            {adminData && (
+              <div className="mt-2 flex items-center gap-2">
+                <Badge className="bg-green-500 text-white">
+                  Login sebagai: {adminData.username}
+                </Badge>
+                {document.cookie.includes('accessToken') && document.cookie.includes('refreshToken') && (
+                  <Badge className="bg-blue-500 text-white">
+                    Admin Suku Dinas
+                  </Badge>
+                )}
+                {localStorage.getItem('userData') && !document.cookie.includes('accessToken') && (
+                  <Badge className="bg-green-500 text-white">
+                    User Eksternal
+                  </Badge>
+                )}
+                {!localStorage.getItem('userData') && !document.cookie.includes('accessToken') && (
+                  <Badge className="bg-orange-500 text-white">
+                    Akses Public
+                  </Badge>
+                )}
+              </div>
+            )}
           </div>
-          <Button variant="ghost" onClick={handleLogout}>
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={checkCookieStatus} size="sm">
+              Check Cookies
+            </Button>
+            <Button variant="outline" onClick={simulateAdminLogin} size="sm" className="bg-blue-500 text-white">
+              Simulasi Admin
+            </Button>
+            <Button variant="outline" onClick={simulateExternalUser} size="sm" className="bg-green-500 text-white">
+              Simulasi Eksternal
+            </Button>
+            <Button variant="outline" onClick={simulatePublicUser} size="sm" className="bg-orange-500 text-white">
+              Simulasi Public
+            </Button>
+            <Button variant="outline" onClick={testToast} size="sm" className="bg-purple-500 text-white">
+              Test Toast
+            </Button>
+            <Button variant="ghost" onClick={handleLogout} disabled={isLoggingOut}>
+              <LogOut className="w-4 h-4 mr-2" />
+              {isLoggingOut ? 'Logging out...' : 'Logout'}
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -259,6 +541,20 @@ export const AdminDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Cookie Status Debug (only show if there's cookie status) */}
+        {cookieStatus && (
+          <Card className="bg-gray-50">
+            <CardHeader>
+              <CardTitle className="text-sm">Debug: Cookie Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <pre className="text-xs bg-white p-2 rounded border overflow-auto">
+                {cookieStatus}
+              </pre>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Main Content */}
         <Tabs defaultValue="suggestions" className="space-y-6">

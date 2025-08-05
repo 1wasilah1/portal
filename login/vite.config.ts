@@ -4,9 +4,14 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: '/login/',
+  base: '/',
   server: {
     port: 1225,
+    hmr: {
+      port: 1225,
+      host: 'localhost',
+      protocol: 'ws'
+    }
   },
   plugins: [
     react(),

@@ -10,7 +10,40 @@ const HeroSection = ({ onScrollClick }) => {
     total_anggaran: 0,
   });
 
+  const [authStatus, setAuthStatus] = useState(null);
+
   const baseUrl = process.env.REACT_APP_API_URL;
+
+  // Function to check authentication status
+  const checkAuthStatus = () => {
+    const cookies = document.cookie;
+    const hasAccessToken = cookies.includes('accessToken');
+    const hasRefreshToken = cookies.includes('refreshToken');
+    const userData = localStorage.getItem('userData');
+    
+    console.log('🔍 Portal Auth Check:', {
+      hasAccessToken,
+      hasRefreshToken,
+      hasUserData: !!userData,
+      allCookies: cookies
+    });
+    
+    if (hasAccessToken && hasRefreshToken) {
+      setAuthStatus('admin');
+      console.log('🔵 Portal: Admin user detected');
+    } else if (userData) {
+      setAuthStatus('external');
+      console.log('🟢 Portal: External user detected');
+    } else {
+      setAuthStatus('public');
+      console.log('🟠 Portal: Public user detected');
+    }
+  };
+
+  useEffect(() => {
+    // Check authentication status on component mount
+    checkAuthStatus();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,6 +75,9 @@ const HeroSection = ({ onScrollClick }) => {
     jumlah_cip,
     total_anggaran,
   } = summary;
+
+  // Check if anggaran should be hidden
+  const shouldHideAnggaran = authStatus === 'public' || authStatus === 'external';
 
   return (
     <div className="hero-wrapper">
@@ -95,20 +131,34 @@ const HeroSection = ({ onScrollClick }) => {
                 </div>
               </div>
 
-              <div className="hero-card green animate__animated animate__bounceIn animate__delay-2-5s">
-                <div className="icon-area">
-                  <i className="bi-cash-coin"></i>
-                </div>
-                <div className="text-end">
-                  <div className="hero-value">
-                    {total_anggaran.toLocaleString('id-ID', {
-                      style: 'currency',
-                      currency: 'IDR',
-                    })}
+              {/* Anggaran card - only show for admin users */}
+              {!shouldHideAnggaran ? (
+                <div className="hero-card green animate__animated animate__bounceIn animate__delay-2-5s">
+                  <div className="icon-area">
+                    <i className="bi-cash-coin"></i>
                   </div>
-                  <div className="hero-label">Anggaran</div>
+                  <div className="text-end">
+                    <div className="hero-value">
+                      {total_anggaran.toLocaleString('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR',
+                      })}
+                    </div>
+                    <div className="hero-label">Anggaran</div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                // Placeholder card for non-admin users
+                <div className="hero-card green animate__animated animate__bounceIn animate__delay-2-5s" style={{ opacity: 0.3 }}>
+                  <div className="icon-area">
+                    <i className="bi-lock"></i>
+                  </div>
+                  <div className="text-end">
+                    <div className="hero-value">***</div>
+                    <div className="hero-label">Anggaran (Admin Only)</div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

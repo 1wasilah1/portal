@@ -1,5 +1,15 @@
 <template>
     <div id="map" class="map"></div>
+    
+    <!-- Authentication Status Alerts -->
+    <div v-if="authStatus" class="auth-alert" :class="authStatus">
+        <div class="alert-content">
+            <span class="alert-icon">{{ getAlertIcon() }}</span>
+            <span class="alert-text">{{ getAlertText() }}</span>
+            <button @click="closeAuthAlert" class="alert-close">×</button>
+        </div>
+    </div>
+    
     <div class="tools">
         <button @click="toggleLayerList" id="btn-layer-list" class="btn rounded-circle logo" title="Daftar Data">
             <img v-if="!isLayerListVisible" :src="visibleIcon" alt="Show Layer List" class="icon"/>
@@ -81,6 +91,9 @@ const vectorLayers = ref(null);
 const isLayerListVisible = ref(false);
 const isBasemapListVisible = ref(false);
 const selectedBasemapImage = ref(defaultBasemap);
+const authStatus = ref(null); // 'internal', 'external', 'public'
+const userData = ref(null); // Store user data from SSO API
+const username = ref(null); // Store username from backend
 
 const visibleIcon = layerGroupIcon
 
@@ -91,7 +104,217 @@ const toggleBasemapList = () => {
     isBasemapListVisible.value = !isBasemapListVisible.value;
 };
 
+// Helper function to get cookie value
+const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+};
+
+// Helper function to delete cookie
+const deleteCookie = (name) => {
+    document.cookie = name + '=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+};
+
+const closeAuthAlert = async () => {
+    const currentAuthStatus = authStatus.value;
+    authStatus.value = null;
+    
+    // If internal user, call SSO logout and clear cookies
+    if (currentAuthStatus === 'internal') {
+        try {
+            // Call SSO API logout
+            const response = await fetch('https://10.15.38.162:3100/api/sso/v1/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                console.log('SSO logout successful');
+            } else {
+                console.log('SSO logout failed:', response.status);
+            }
+        } catch (error) {
+            console.error('SSO logout error:', error);
+        }
+        
+        // Clear client-side cookies
+        deleteCookie('admin_login');
+        deleteCookie('admin_login_time');
+        deleteCookie('refreshToken');
+        deleteCookie('accessToken');
+        
+        // Clear localStorage
+        localStorage.removeItem('adminLoginStatus');
+        localStorage.removeItem('adminLoginTime');
+    }
+    
+    // If external user, clear localStorage
+    if (currentAuthStatus === 'external') {
+        localStorage.removeItem('userEmail');
+    }
+};
+
+const getAlertIcon = () => {
+    switch (authStatus.value) {
+        case 'internal': return '👤';
+        case 'external': return '👥';
+        case 'public': return '🌐';
+        default: return '👤';
+    }
+};
+
+const getAlertText = () => {
+    console.log('=== ALERT TEXT DEBUG ===');
+    console.log('Auth status:', authStatus.value);
+    console.log('Username value:', username.value);
+    console.log('User data value:', userData.value);
+    
+    switch (authStatus.value) {
+        case 'internal': 
+            if (username.value) {
+                const text = `Login sebagai internal (${username.value})`;
+                console.log('Internal alert text:', text);
+                return text;
+            }
+            console.log('Internal alert text: Login sebagai internal (no username)');
+            return 'Login sebagai internal';
+        case 'external': 
+            console.log('External alert text: Login sebagai external');
+            return 'Login sebagai external';
+        case 'public': 
+            console.log('Public alert text: Akses public');
+            return 'Akses public';
+        default: 
+            console.log('Default alert text: Login sebagai internal');
+            return 'Login sebagai internal';
+    }
+};
+
 onMounted(async () => {
+    // Check authentication status
+    let isInternal = false;
+    let isExternal = false;
+    
+    // Check for internal authentication (HTTP-only cookies)
+    try {
+        console.log('Making request to /admin/verify');
+        console.log('Current location:', window.location.href);
+        console.log('Current origin:', window.location.origin);
+        
+        // Use proxy URL for admin verification
+        let response;
+        let usedUrl = '/admin/verify';
+        
+        console.log('Using proxy URL:', usedUrl);
+        response = await fetch(usedUrl, {
+            method: 'GET',
+            credentials: 'include', // Include cookies
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        console.log('Used URL:', usedUrl);
+        
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+        console.log('Response headers:', response.headers);
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('=== BACKEND RESPONSE DEBUG ===');
+            console.log('Backend response:', data);
+            console.log('Response data type:', typeof data);
+            console.log('Response data keys:', Object.keys(data));
+            console.log('Is admin:', data.isAdmin);
+            console.log('Username in response:', data.username);
+            console.log('User data in response:', data.userData);
+            console.log('Development mode:', data.developmentMode);
+            console.log('SSO authenticated:', data.ssoAuthenticated);
+            console.log('================================');
+            
+            if (data.isAdmin) {
+                isInternal = true;
+                userData.value = data.userData; // Store user data from SSO API
+                username.value = data.username; // Store username from backend
+                console.log('=== INTERNAL USER DEBUG ===');
+                console.log('Internal user authenticated:', data);
+                console.log('User data stored:', userData.value);
+                console.log('Username from backend:', data.username);
+                console.log('Username stored in ref:', username.value);
+                console.log('Auth status set to:', authStatus.value);
+                console.log('================================');
+            } else {
+                console.log('Not admin, reason:', data.reason);
+            }
+        } else {
+            console.log('Backend response not ok:', response.status);
+        }
+    } catch (error) {
+        console.error('Error checking internal status:', error);
+        console.error('Request URL was:', '/admin/verify');
+        console.error('Full error details:', error.message);
+        // Fallback to client-side cookie check
+        const adminLoginStatus = getCookie('admin_login');
+        const adminLoginTime = getCookie('admin_login_time');
+        const refreshToken = getCookie('refreshToken');
+        const accessToken = getCookie('accessToken');
+        
+        console.log('Client-side cookie check:');
+        console.log('- admin_login:', adminLoginStatus);
+        console.log('- admin_login_time:', adminLoginTime);
+        console.log('- refreshToken:', refreshToken ? 'exists' : 'not found');
+        console.log('- accessToken:', accessToken ? 'exists' : 'not found');
+        console.log('- All cookies:', document.cookie);
+        
+        if (adminLoginStatus === 'true' && adminLoginTime) {
+            const loginTime = new Date(adminLoginTime);
+            const now = new Date();
+            const timeDiff = now.getTime() - loginTime.getTime();
+            const hoursDiff = timeDiff / (1000 * 60 * 60);
+            
+            if (hoursDiff < 24) {
+                isInternal = true;
+            } else {
+                deleteCookie('admin_login');
+                deleteCookie('admin_login_time');
+            }
+        }
+    }
+    
+    // Check for external authentication (localStorage)
+    const userEmail = localStorage.getItem('userEmail');
+    if (userEmail) {
+        isExternal = true;
+        console.log('External user found:', userEmail);
+    }
+    
+    // Set authentication status
+    console.log('=== AUTH STATUS SETTING ===');
+    console.log('Is internal:', isInternal);
+    console.log('Is external:', isExternal);
+    console.log('Username value before setting:', username.value);
+    
+    if (isInternal) {
+        authStatus.value = 'internal';
+        console.log('Set auth status to: internal');
+    } else if (isExternal) {
+        authStatus.value = 'external';
+        console.log('Set auth status to: external');
+    } else {
+        authStatus.value = 'public';
+        console.log('Set auth status to: public');
+    }
+    
+    console.log('Final auth status:', authStatus.value);
+    console.log('Final username value:', username.value);
+    console.log('================================');
+    
     mapInstance.value = new Map({
         target: 'map',
         view: new View({
@@ -119,6 +342,80 @@ onMounted(async () => {
     width: 100vw;
     height: 100vh;
     transition: all 500ms ease-out;
+}
+
+.auth-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slideIn 0.3s ease-out;
+    max-width: 300px;
+}
+
+.auth-alert.internal {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.auth-alert.external {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+}
+
+.auth-alert.public {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    color: white;
+}
+
+.alert-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alert-icon {
+    font-size: 18px;
+}
+
+.alert-text {
+    flex: 1;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.alert-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.alert-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 .btn-basemap {

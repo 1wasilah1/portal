@@ -118,7 +118,7 @@ const BarChartCard = ({ title, filters, data, loading }) => {
     scales: {
       y: {
         beginAtZero: true,
-        title: { display: true, text: 'Jumlah' },
+        title: { display: true, text: 'Jumlah RW' },
         ticks: { padding: 10 },
         grid: { drawTicks: true },
       },
@@ -146,6 +146,12 @@ const BarChartCard = ({ title, filters, data, loading }) => {
         offset: true,
         display: false,
         labels: labels.map((_, i) => i),
+      },
+    },
+    // Menambahkan pengaturan untuk menghapus angka di atas bar chart
+    plugins: {
+      datalabels: {
+        display: false, // Menonaktifkan angka di atas bar chart
       },
     },
   };

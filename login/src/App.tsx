@@ -9,6 +9,7 @@ import { AdminLogin } from "./pages/AdminLogin";
 import { CitizenRegister } from "./pages/CitizenRegister";
 import { ProgressTracking } from "./pages/ProgressTracking";
 import { AdminDashboard } from "./pages/AdminDashboard";
+import { ClearCookies } from "./pages/ClearCookies";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/citizen/register" element={<CitizenRegister />} />
           <Route path="/citizen/progress" element={<ProgressTracking />} />
+          <Route path="/clear-cookies" element={<ClearCookies />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

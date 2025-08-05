@@ -1,0 +1,9 @@
+.treemap-body {
+  position: relative;
+  height: 400px;
+}
+
+.treemap-card canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
