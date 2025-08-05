@@ -15,6 +15,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api', geoRoutes);
+app.use('/api/admin', require('./routes/batasAdmin'));
 
 // Login route
 app.post('/login', async (req, res) => {

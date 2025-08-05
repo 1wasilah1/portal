@@ -1,5 +1,5 @@
 <script setup>
-const navigate = (url) => window.open(url, '_blank');
+const navigate = (url) => window.location.href = url;
 </script>
 
 <template>
