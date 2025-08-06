@@ -16,7 +16,7 @@ router.get('/chart-bar', async (req, res) => {
     const filters = [];
     const values = [];
 
-    // Tahun CAP dan CIP
+    // Tahun CAP dan CIP (hardcoded sesuai requirement)
     const tahunClause = `(tahun_cap = '2023' OR tahun_cip = '2024')`;
 
     if (wilayah && wilayah !== 'Semua') {
@@ -52,6 +52,13 @@ router.get('/chart-bar', async (req, res) => {
       ORDER BY nama_kegiatan
     `;
 
+    // 🔍 Debug log
+    console.log('--- /chart-bar DEBUG ---');
+    console.log('Filters:', req.query);
+    console.log('Where Clause:', whereClause);
+    console.log('SQL Query:', query);
+    console.log('Values:', values);
+
     const result = await pool.query(query, values);
 
     const response = result.rows.map(row => ({
@@ -60,9 +67,13 @@ router.get('/chart-bar', async (req, res) => {
       jumlah_cip: parseInt(row.jumlah_cip || 0)
     }));
 
+    // 🔍 Result log
+    console.log('Query Result:', result.rows);
+    console.log('Response to Client:', response);
+
     res.json(response);
   } catch (error) {
-    console.error('Error fetching bar chart data:', error);
+    console.error('❌ Error fetching bar chart data:', error);
     res.status(500).json({ error: 'Gagal mengambil data bar chart kegiatan' });
   }
 });
