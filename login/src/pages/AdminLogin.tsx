@@ -62,7 +62,7 @@ export const AdminLogin = () => {
         });
         
         // Redirect to admin dashboard - HTTP-only cookies will be automatically sent
-        window.location.href = 'https://localhost:9200/login/admin/dashboard';
+        window.location.href = 'https://localhost:9200/admin/dashboard';
       } else {
         const errorData = await response.json();
         toast({
