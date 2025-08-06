@@ -38,7 +38,7 @@ export const Header = ({
     if (onHomeClick) {
       onHomeClick();
     } else {
-      navigate('/citizen/progress');
+              navigate('/progressCitizen');
     }
   };
 

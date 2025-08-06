@@ -117,7 +117,7 @@ export const ProgressTracking = () => {
     const storedUserEmail = localStorage.getItem('userEmail');
     if (!storedUserEmail) {
       // User not logged in, redirect to register page
-      navigate('/login/citizen/register');
+              navigate('/loginCitizen');
       return;
     }
     setUserEmail(storedUserEmail);

@@ -12,7 +12,7 @@ const Index = () => {
       <div className="max-w-4xl mx-auto text-center space-y-12 animate-fade-in">
         {/* Action Cards */}
         <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-          <Card className="shadow-elegant hover:shadow-glow transition-all duration-300 hover:-translate-y-1 cursor-pointer group" onClick={() => navigate('/citizen/register')}>
+          <Card className="shadow-elegant hover:shadow-glow transition-all duration-300 hover:-translate-y-1 cursor-pointer group" onClick={() => navigate('/loginCitizen')}>
             <CardHeader className="text-center pb-4">
               <div className="mx-auto w-16 h-16 bg-gradient-accent rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <Users className="w-8 h-8 text-white" />
@@ -27,7 +27,7 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          <Card className="shadow-elegant hover:shadow-glow transition-all duration-300 hover:-translate-y-1 cursor-pointer group" onClick={() => navigate('/admin/login')}>
+          <Card className="shadow-elegant hover:shadow-glow transition-all duration-300 hover:-translate-y-1 cursor-pointer group" onClick={() => navigate('/loginAdmin')}>
             <CardHeader className="text-center pb-4">
               <div className="mx-auto w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <Shield className="w-8 h-8 text-white" />

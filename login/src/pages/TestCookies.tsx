@@ -46,7 +46,7 @@ export const TestCookies = () => {
 
   const testAdminLogin = async () => {
     try {
-      const response = await fetch('/login/admin/login', {
+      const response = await fetch('/admin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
