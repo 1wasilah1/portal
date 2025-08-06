@@ -66,7 +66,7 @@ app.use('/static', createProxyMiddleware({
 }));
 
 // Proxy untuk portaldata-fe
-app.use('/portal-data', createProxyMiddleware({
+app.use('/portal', createProxyMiddleware({
   target: 'http://localhost:3000',
   changeOrigin: true,
   secure: false,
@@ -74,7 +74,7 @@ app.use('/portal-data', createProxyMiddleware({
     '^/': '/',
   },
   onError: (err, req, res) => {
-    console.error('Proxy error for /portal-data:', err.message);
+    console.error('Proxy error for /portal:', err.message);
     res.status(500).json({ error: 'Proxy error', message: err.message });
   },
   logLevel: 'debug',
@@ -92,7 +92,7 @@ app.use('/portal-be', createProxyMiddleware({
     '^/': '/',
   },
   onError: (err, req, res) => {
-    console.error('Proxy error for /portal-be:', err.message);
+    console.error('Proxy error for /portal:', err.message);
     res.status(500).json({ error: 'Proxy error', message: err.message });
   },
   logLevel: 'debug',
@@ -199,7 +199,7 @@ app.use('/api', createProxyMiddleware({
 app.use('/', (req, res, next) => {
   if (
     req.path === '/health' ||
-    req.path.startsWith('/portal-data') ||
+    req.path.startsWith('/portal') ||
     req.path.startsWith('/static') ||
     req.path.startsWith('/api')
   ) {
