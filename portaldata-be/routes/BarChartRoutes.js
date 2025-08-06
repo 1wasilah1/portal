@@ -52,6 +52,12 @@ router.get('/chart-bar', async (req, res) => {
       ORDER BY nama_kegiatan
     `;
 
+    // 🧪 Debug: tampilkan query dan values di log
+    console.log('🟡 QUERY SQL:');
+    console.log(query);
+    console.log('🔵 VALUES:');
+    console.log(values);
+
     const result = await pool.query(query, values);
 
     const response = result.rows.map(row => ({
@@ -62,8 +68,11 @@ router.get('/chart-bar', async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    console.error('Error fetching bar chart data:', error);
-    res.status(500).json({ error: 'Gagal mengambil data bar chart kegiatan' });
+    console.error('❌ Error fetching bar chart data:', error);
+    res.status(500).json({
+      error: 'Gagal mengambil data bar chart kegiatan',
+      message: error.message,
+    });
   }
 });
 
