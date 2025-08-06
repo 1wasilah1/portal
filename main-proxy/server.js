@@ -89,7 +89,7 @@ app.use('/portal-be', createProxyMiddleware({
   changeOrigin: true,
   secure: false,
   pathRewrite: {
-    '^/portal-be': '', 
+    '^/': '/',
   },
   onError: (err, req, res) => {
     console.error('Proxy error for /portal:', err.message);
