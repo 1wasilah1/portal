@@ -5,11 +5,17 @@ const bcrypt = require('bcryptjs');
 const pool = require('./db');
 const geoRoutes = require('./routes/geo');
 const batasAdminRoutes = require('./routes/batasAdmin');
+const katalogRoutes = require('./routes/katalog');
 const cors = require('cors');
 require('dotenv').config();
 
 // CORS harus di atas semua route
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:9100', // atau spesifik 'http://localhost:' IP FE
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
 // Middleware parsing JSON
 app.use(express.json());
@@ -17,9 +23,10 @@ app.use(express.json());
 // Routes
 app.use('/api', geoRoutes);
 app.use('/api/admin', batasAdminRoutes);
+app.use('/api/katalog', katalogRoutes);
 
 // Login route
-app.post('/login', async (req, res) => {
+app.post('/auth', async (req, res) => {
   const { username, password } = req.body;
   try {
     const result = await pool.query('SELECT * FROM users WHERE username=$1', [username]);

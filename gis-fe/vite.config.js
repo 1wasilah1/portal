@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/gis/peta/',
+  base: '/gis-fe',
   plugins: [vue()],
   server: {
     port: 9100,
@@ -15,12 +15,12 @@ export default defineConfig({
     },
     proxy: {
       '/api/peta': {
-        target: 'http://10.15.38.162:9200/api', // Ganti dengan URL backend Anda
+        target: 'http://10.15.38.162:9000/api', // Ganti dengan URL backend Anda
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       },
       '/admin': {
-        target: 'http://localhost:9200', // GIS backend
+        target: 'http://localhost:9000', // GIS backend
         changeOrigin: true,
         secure: false,
         configure: (proxy, options) => {
@@ -33,7 +33,7 @@ export default defineConfig({
         }
       },
       '/auth': {
-        target: 'http://localhost:9200', // GIS backend
+        target: 'http://localhost:9000', // GIS backend
         changeOrigin: true,
         secure: false
       }

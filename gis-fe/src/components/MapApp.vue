@@ -10,12 +10,7 @@
         </div>
     </div>
     
-    <div class="tools">
-        <button @click="toggleLayerList" id="btn-layer-list" class="btn rounded-circle logo" title="Daftar Data">
-            <img v-if="!isLayerListVisible" :src="visibleIcon" alt="Show Layer List" class="icon"/>
-            <i v-else class="fas fa-times icon-close"></i>
-        </button>
-    </div>
+    <!-- map control -->
     <div>
         <button @click="toggleBasemapList" class="btn-basemap">
             <img :src="selectedBasemapImage" alt="Selected Basemap" />
@@ -26,8 +21,8 @@
         <ZoomButton v-if="mapInstance" :map="mapInstance" />
         <HomeButton v-if="mapInstance" :map="mapInstance" />
         <FeatureInfo v-if="mapInstance && overlayGroups" :map="mapInstance" :overlaygroup="overlayGroups" />
-        <LayerList v-if="mapInstance && overlayGroups && isLayerListVisible" :map="mapInstance" :overlaygroup="overlayGroups" :layers="vectorLayers" />
-        <LayerList1 v-if="mapInstance && overlayGroups && isLayerListVisible" :map="mapInstance" :overlaygroup="overlayGroups" :layers="vectorLayers" />
+        <LayerList v-if="mapInstance && overlayGroups" :map="mapInstance" :overlaygroup="overlayGroups" :layers="vectorLayers" />
+        <!-- <LayerList1 v-if="mapInstance && overlayGroups && isLayerListVisible" :map="mapInstance" :overlaygroup="overlayGroups" :layers="vectorLayers" /> -->
         <BasemapList v-if="mapInstance && overlayGroups && isBasemapListVisible"
                      :map="mapInstance"
                      :overlaygroup="overlayGroups"
@@ -73,7 +68,7 @@ import FullscreenToggle from './fullscreen.vue';
 // import pdf from './pdf.vue';
 import FeatureInfo from './FeatureInfo.vue';
 import LayerList from './LayerList.vue';
-import LayerList1 from './LayerList1.vue';
+// import LayerList1 from './LayerList1.vue';
 import BasemapList from './BasemapList.vue';
 import SearchFeature from './SearchFeature.vue';
 import Geolocation from './geolocation.vue';
@@ -477,12 +472,12 @@ onMounted(async () => {
   width: auto;
 }
 
-.tools {
+/* .tools {
     position: absolute;
     z-index: 1;
     top: 160px;
     left: 0px;
-}
+} */
 
 /* Responsif tambahan untuk layar kecil */
 @media (max-width: 768px) {
@@ -495,10 +490,10 @@ onMounted(async () => {
     height: 5vw;
   }
 
-  .tools {
+  /* .tools {
     top: 22vh;
     left: 2vw;
-  }
+  } */
 
   
 }

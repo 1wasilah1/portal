@@ -34,9 +34,19 @@
 
       <div class="filter-group">
         <h3><i class="fas fa-map-pin"></i> Kelurahan</h3>
-        <select v-model="selectedKelurahan" @change="zoomToLocation" :disabled="!selectedKecamatan">
+        <select v-model="selectedKelurahan" @change="loadRukunWarga" :disabled="!selectedKecamatan">
           <option value="">Pilih Kelurahan</option>
           <option v-for="kel in kelurahanList" :key="kel.id" :value="kel">
+            {{ kel.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <h3><i class="fas fa-map-pin"></i> Rukun Warga (RW)</h3>
+        <select v-model="selectedRukunWarga" @change="zoomToLocation" :disabled="!selectedKelurahan">
+          <option value="">Pilih Rukun Warga (RW)</option>
+          <option v-for="kel in rukunWargaList" :key="kel.id" :value="kel">
             {{ kel.name }}
           </option>
         </select>
@@ -71,10 +81,12 @@ export default {
       kotaList: [],
       kecamatanList: [],
       kelurahanList: [],
+      rukunWargaList: [],
 
       selectedKota: null,
       selectedKecamatan: null,
       selectedKelurahan: null,
+      selectedRukunWarga: null,
 
       filteredLayer: null,
       panelCollapsed: true
@@ -106,6 +118,7 @@ export default {
       this.kelurahanList = [];
       this.selectedKecamatan = null;
       this.selectedKelurahan = null;
+      this.selectedRukunWarga = null;
 
       if (!this.selectedKota?.name) return;
 
@@ -139,6 +152,24 @@ export default {
       }
     },
 
+    async loadRukunWarga() {
+      this.rukunWargaList = [];
+      this.selectedRukunWarga = null;
+
+      if (!this.selectedKelurahan?.name) return;
+
+      try {
+        const res = await fetch(`${apiBase}/api/admin/geojson-rukunwarga?kota=${this.selectedKota.name}&kecamatan=${this.selectedKecamatan.name}&kelurahan=${this.selectedKelurahan.name}`);
+        const data = await res.json();
+        this.rukunWargaList = data.map((kel, i) => ({
+          id: i + 1,
+          name: kel
+        }));
+      } catch (err) {
+        console.error('Gagal ambil rukun warga:', err);
+      }
+    },
+
     async applyFilters() {
       if (!this.selectedKota?.name) {
         console.warn('Kota belum dipilih');
@@ -150,6 +181,7 @@ export default {
       params.append('kota', this.selectedKota?.name || '');
       if (this.selectedKecamatan?.name) params.append('kecamatan', this.selectedKecamatan.name);
       if (this.selectedKelurahan?.name) params.append('kelurahan', this.selectedKelurahan.name);
+      if (this.selectedRukunWarga?.name) params.append('rw', this.selectedRukunWarga.name)
 
       try {
         const res = await fetch(`${apiBase}/api/admin/geojson?${params.toString()}`);
@@ -167,6 +199,8 @@ export default {
       this.selectedKelurahan = null;
       this.kecamatanList = [];
       this.kelurahanList = [];
+      this.rukunWargaList = [];
+      this.panelCollapsed = true;
 
       if (this.filteredLayer) {
         this.map.removeLayer(this.filteredLayer);
@@ -270,19 +304,23 @@ export default {
   right: 0;
   z-index: 1000;
   margin-right: 30px;
+  border-radius: 6px;
 }
 
 .filter-panel {
   height: 370px;
   width: 100%;
   background: white;
-  padding: 1.25rem;
+  padding: 1rem;
+  padding-right: 1.25rem;
   overflow-y: auto;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   transition: var(--transition);
   border-left: 1px solid #e0e0e0;
+  border-radius: 6px;
+  clip-path: inset(0 round 6px);
 }
 
 .map-container.collapsed {

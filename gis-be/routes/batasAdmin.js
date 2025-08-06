@@ -122,5 +122,21 @@ router.get('/geojson-kelurahan', async (req, res) => {
   }
 });
 
+// Ambil list rukun warga berdasarkan kota + kecamatan + kelurahan
+router.get('/geojson-rukunwarga', async (req, res) => {
+  const { kota, kecamatan, kelurahan } = req.query;
+  if (!kota || !kecamatan || !kelurahan ) return res.status(400).json({ error: 'Missing kota/kecamatan/kelurahan' });
+
+  try {
+    const result = await pool.query(
+      `SELECT DISTINCT "WADMRW" FROM admin_jkt WHERE "WADMKK" = $1 AND "WADMKC" = $2 AND "WADMKD" = $3 ORDER BY "WADMRW"`,
+      [kota, kecamatan, kelurahan]
+    );
+    res.json(result.rows.map(r => r.WADMRW));
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch kelurahan' });
+  }
+});
+
 
 module.exports = router;
