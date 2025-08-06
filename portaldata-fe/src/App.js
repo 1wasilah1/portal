@@ -6,6 +6,7 @@ import TreemapChartCard from './components/TreemapChartCard';
 import TableDetailCard from './components/TableDetailCard';
 import AllDataTable from './components/AllDataTable';
 import FilterPanel from './components/FilterPanel';
+import ProyeksiCard from './components/ProyeksiCard';
 import './App.css';
 import 'animate.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -251,16 +252,16 @@ function App() {
             <BarChartCard title="CAP dan CIP berdasarkan RW Kumuh" filters={filters} data={barChartData} />
           </div>
           <div className="col-md-6">
-            <TreemapChartCard title="Treemap Anggaran CAP" filters={filters} data={donutCapData} />
+              <DonutChartCard title="Anggaran CIP" filters={filters} data={donutCipData} />
           </div>
-          <div className="col-md-6">
+          <div className="col-md-12">
             <TableDetailCard title="Detail CIP" filters={filters} data={tableCipData} /> {/* ✅ Update */}
-          </div>
-          <div className="col-md-6">
-              <TreemapChartCard title="Treemap Anggaran CIP" filters={filters} data={donutCipData} />
           </div>
           <div className="col-md-12">
             <AllDataTable filters={filters} data={tableCipData} /> {/* ✅ Update */}
+          </div>
+          <div className="col-md-12">
+            <ProyeksiCard /> {/* ✅ Update */}
           </div>
         </div>
       </div>

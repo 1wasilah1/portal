@@ -6,14 +6,16 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import './css/DonutChartCard.css';
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
 const DonutChartCard = ({ title, filters = {}, data = [] }) => {
   const [legendPosition, setLegendPosition] = useState(
     window.innerWidth < 576 ? 'bottom' : 'right'
   );
+  const [authStatus, setAuthStatus] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -23,23 +25,30 @@ const DonutChartCard = ({ title, filters = {}, data = [] }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Filter data berdasarkan wilayah yang dipilih
-  const filteredData = data.filter((item) => {
-    return (
-      (!filters.wilayah || item.nama_kabkota === filters.wilayah) &&
-      (!filters.kecamatan || item.nama_kec === filters.kecamatan) &&
-      (!filters.kelurahan || item.nama_kel === filters.kelurahan) &&
-      (!filters.rw || item.nama_rw === filters.rw)
-    );
-  });
+  useEffect(() => {
+    const cookies = document.cookie;
+    const hasAccessToken = cookies.includes('accessToken');
+    const hasRefreshToken = cookies.includes('refreshToken');
+    const userData = localStorage.getItem('userData');
 
+    if (hasAccessToken && hasRefreshToken) {
+      setAuthStatus('admin');
+    } else if (userData) {
+      setAuthStatus('external');
+    } else {
+      setAuthStatus('public');
+    }
+  }, []);
+
+  const shouldHideAnggaran = authStatus === 'external' || authStatus === 'public';
+
+  const MAX_ANGGARAN = 1_000_000_000_000_000;
   const aggregation = {};
-  const MAX_ANGGARAN = 1_000_000_000_000_000; // Maksimal Rp 1.000 Triliun
 
-  filteredData.forEach((item) => {
-    const label = item.nama_kegiatan || 'Lainnya';
-    const rawValue = item.anggaran || 0;
-    const value = Math.min(rawValue, MAX_ANGGARAN); // batasi per item
+  data.forEach((item) => {
+    const label = item.nama_kegiatan?.trim() || 'Lainnya';
+    const rawValue = item.total_anggaran_cip || 0;
+    const value = Math.min(rawValue, MAX_ANGGARAN);
     aggregation[label] = (aggregation[label] || 0) + value;
   });
 
@@ -53,16 +62,16 @@ const DonutChartCard = ({ title, filters = {}, data = [] }) => {
       {
         data: values,
         backgroundColor: [
+          '#F76060',
+          '#F54A8A',
+          '#C03E99',
+          '#993399',
+          '#6666CC',
+          '#3399CC',
+          '#66DDEE',
           '#4BC0C0',
           '#36A2EB',
-          '#FFCE56',
-          '#FF6384',
-          '#9966FF',
-          '#FF9F40',
-          '#00C49F',
-          '#C71585',
-          '#8B0000',
-          '#2E8B57',
+          '#A9A9A9',
         ].slice(0, values.length),
         borderWidth: 1,
       },
@@ -70,23 +79,63 @@ const DonutChartCard = ({ title, filters = {}, data = [] }) => {
   };
 
   const options = {
-    cutout: '70%',
+    cutout: '65%',
+    layout: {
+      padding: 50,
+    },
     plugins: {
+      legend: {
+        display: false,
+        position: legendPosition,
+      },
       tooltip: {
         callbacks: {
           label: function (context) {
-            let value = context.parsed;
-            const max = MAX_ANGGARAN;
-            if (value > max) value = max;
+            const value = context.parsed;
+            const label = context.label;
             const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-            return `${context.label}: Rp ${value.toLocaleString('id-ID')} (${percentage}%)`;
+
+            // Hanya tampilkan label dan persentase jika bukan admin
+            if (shouldHideAnggaran) {
+              return `${label}: ${percentage}%`;
+            }
+
+            return `${label}: Rp ${value.toLocaleString('id-ID')} (${percentage}%)`;
           },
         },
       },
-      legend: {
-        position: legendPosition,
-        labels: {
-          boxWidth: 12,
+      datalabels: {
+        color: '#000',
+        anchor: 'end',
+        align: 'end',
+        offset: 10,
+        clamp: true,
+        clip: false,
+        font: {
+          size: 11,
+        },
+        formatter: function (value, context) {
+          const label = context.chart.data.labels[context.dataIndex];
+          const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+
+          if (percentage <= 0 || value === 0) return null;
+
+          const wrapLabel = (label, maxLength = 10) => {
+            const words = label.split(' ');
+            let result = '';
+            let line = '';
+            words.forEach(word => {
+              if ((line + word).length > maxLength) {
+                result += line + '\n';
+                line = '';
+              }
+              line += word + ' ';
+            });
+            result += line.trim();
+            return result;
+          };
+
+          return `${wrapLabel(label)}\n${percentage}%`;
         },
       },
     },
@@ -101,12 +150,6 @@ const DonutChartCard = ({ title, filters = {}, data = [] }) => {
       <div className="card-body donut-body">
         <div className="donut-wrapper">
           <Doughnut data={chartData} options={options} />
-          <div className="donut-total">
-            <h3>
-              {total.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
-            </h3>
-            <p>Total Anggaran</p>
-          </div>
         </div>
       </div>
     </div>

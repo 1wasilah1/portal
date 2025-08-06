@@ -70,7 +70,7 @@ const FilterPanel = ({
       </div>
       <div className="col-12 col-md-auto d-flex align-items-center justify-content-center">
         <button className="btn-reset-filter" onClick={onReset}>
-          <img src="/img/filter.png" alt="Reset Filter" className="filter-icon" />
+          <img src="/portal/img/filter.png" alt="Reset Filter" className="filter-icon" />
         </button>
       </div>
     </div>

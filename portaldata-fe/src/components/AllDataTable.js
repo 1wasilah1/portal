@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useId, useMemo } from 'react';
+import React, { useEffect, useRef, useId, useMemo, useState } from 'react';
 import $ from 'jquery';
 
 import 'datatables.net-bs5';
@@ -17,6 +17,23 @@ pdfMake.vfs = pdfFonts.default?.pdfMake?.vfs || pdfFonts?.pdfMake?.vfs;
 const AllDataTable = ({ data = [], filters = {} }) => {
   const tableRef = useRef(null);
   const tableId = useId();
+  const [authStatus, setAuthStatus] = useState(null);
+
+  // Cek status autentikasi
+  useEffect(() => {
+    const cookies = document.cookie;
+    const hasAccessToken = cookies.includes('accessToken');
+    const hasRefreshToken = cookies.includes('refreshToken');
+    const userData = localStorage.getItem('userData');
+
+    if (hasAccessToken && hasRefreshToken) {
+      setAuthStatus('admin');
+    } else if (userData) {
+      setAuthStatus('external');
+    } else {
+      setAuthStatus('public');
+    }
+  }, []);
 
   const filteredData = useMemo(() => {
     return data.filter((row) => {
@@ -31,12 +48,24 @@ const AllDataTable = ({ data = [], filters = {} }) => {
   }, [data, filters]);
 
   const columns = useMemo(() => {
-    return filteredData.length > 0 ? Object.keys(filteredData[0]) : [];
-  }, [filteredData]);
+    return [
+      { title: 'TAHUN', data: 'tahun' },
+      { title: 'NAMA KABUPATEN/KOTA', data: 'nama_kabkota' },
+      { title: 'NAMA KECAMATAN', data: 'nama_kec' },
+      { title: 'NAMA KELURAHAN', data: 'nama_kel' },
+      { title: 'NAMA RW', data: 'nama_rw' },
+      { title: 'NAMA KEGIATAN', data: 'nama_kegiatan' },
+      { title: 'JENIS BAHAN', data: 'tipe_bahan' },
+      { title: 'VOLUME', data: 'volume' },
+      { title: 'SATUAN', data: 'satuan' },
+      { title: 'ANGGARAN (Rp)', data: 'anggaran' },
+    ];
+  }, []);
 
   useEffect(() => {
-    const tableEl = $(tableRef.current);
+    if (authStatus !== 'admin') return;
 
+    const tableEl = $(tableRef.current);
     if ($.fn.DataTable.isDataTable(tableEl)) {
       tableEl.DataTable().destroy();
       tableEl.empty();
@@ -54,50 +83,47 @@ const AllDataTable = ({ data = [], filters = {} }) => {
         dom: 'Brtip',
         data: filteredData,
         columns: columns.map((col) => ({
-          title: col.replace(/_/g, ' ').toUpperCase(),
-          data: col,
+          title: col.title,
+          data: col.data,
           className: 'text-center',
           render: function (data) {
-            if (col.toLowerCase().includes('anggaran') && !isNaN(data)) {
-              return parseInt(data).toLocaleString('id-ID');
+            if (col.title.includes('ANGGARAN') && !isNaN(data)) {
+              return parseFloat(data).toLocaleString('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              });
             }
-            return data;
+            return data ?? '-';
           },
         })),
         buttons: [
           {
             extend: 'excelHtml5',
             titleAttr: 'Export ke Excel',
-            text: '<img src="/img/xlsx.png" alt="Excel" width="40" />',
+            text: '<img src="/portal/img/xlsx.png" alt="Excel" width="40" />',
           },
           {
             extend: 'csvHtml5',
             titleAttr: 'Export ke CSV',
-            text: '<img src="/img/csv.png" alt="CSV" width="40" />',
+            text: '<img src="/portal/img/csv.png" alt="CSV" width="40" />',
           },
           {
             extend: 'pdfHtml5',
             titleAttr: 'Export ke PDF',
-            text: '<img src="/img/pdf.png" alt="PDF" width="40" />',
+            text: '<img src="/portal/img/pdf.png" alt="PDF" width="40" />',
             orientation: 'landscape',
             pageSize: 'A4',
             customize: function (doc) {
               try {
-                if (doc?.content?.[1]?.table) {
-                  const colCount = doc.content[1].table.body[0].length;
-                  doc.content[1].table.widths = Array(colCount).fill('*');
-                  doc.styles.tableHeader = { alignment: 'center', fontSize: 8 };
-                  doc.styles.tableBodyEven = { alignment: 'center', fontSize: 8 };
-                  doc.styles.tableBodyOdd = { alignment: 'center', fontSize: 8 };
-                  doc.defaultStyle.fontSize = 8;
-                  doc.pageMargins = [20, 30, 20, 30];
-                  doc.content.splice(0, 0, {
-                    text: '',
-                    style: 'header',
-                    alignment: 'center',
-                    margin: [0, 0, 0, 10],
-                  });
-                }
+                const colCount = doc.content[1].table.body[0].length;
+                doc.content[1].table.widths = Array(colCount).fill('*');
+                doc.styles.tableHeader = { alignment: 'center', fontSize: 8 };
+                doc.styles.tableBodyEven = { alignment: 'center', fontSize: 8 };
+                doc.styles.tableBodyOdd = { alignment: 'center', fontSize: 8 };
+                doc.defaultStyle.fontSize = 8;
+                doc.pageMargins = [20, 30, 20, 30];
               } catch (err) {
                 console.error('PDF customization error:', err);
               }
@@ -120,12 +146,16 @@ const AllDataTable = ({ data = [], filters = {} }) => {
     });
 
     return () => {
-      if ($.fn.DataTable.isDataTable(tableEl)) {
-        tableEl.DataTable().destroy();
-        tableEl.empty();
+      if ($.fn.DataTable.isDataTable($(tableRef.current))) {
+        $(tableRef.current).DataTable().destroy();
+        $(tableRef.current).empty();
       }
     };
-  }, [filteredData, columns]);
+  }, [filteredData, columns, authStatus]);
+
+  if (authStatus !== 'admin') {
+    return null
+  }
 
   return (
     <div className="card mt-4 shadow-sm">
