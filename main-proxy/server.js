@@ -11,10 +11,10 @@ const authRoutes = require('./routes/auth');
 const adminAuthRoutes = require('./routes/adminAuth');
 
 const corsOptions = {
-  origin: '*', // Mengizinkan semua origin
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'], // Semua metode HTTP yang diizinkan
-  allowedHeaders: ['Content-Type', 'Authorization'], // Header yang diizinkan
-  credentials: true, // Mengizinkan pengiriman cookies dan otentikasi
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 };
 
 const app = express();
@@ -26,203 +26,212 @@ const useHttps = fs.existsSync(keyPath) && fs.existsSync(certPath);
 
 let sslOptions = null;
 if (useHttps) {
-    sslOptions = {
-        key: fs.readFileSync(keyPath),
-        cert: fs.readFileSync(certPath)
-    };
+  sslOptions = {
+    key: fs.readFileSync(keyPath),
+    cert: fs.readFileSync(certPath),
+  };
 }
 
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// ✅ Tambahan untuk menyajikan gambar dari React (misalnya LANRI.png)
+app.use('/portal/img', express.static(path.join(__dirname, '../portaldata-fe/public/img')));
+
 // Route untuk health check
 app.get('/health', (req, res) => {
-    res.json({ status: 'OK', message: 'Proxy server is running' });
+  res.json({ status: 'OK', message: 'Proxy server is running' });
 });
 
 // Auth routes
 app.use('/login', authRoutes);
 app.use('/login', adminAuthRoutes);
 
-// Proxy untuk static files portal (tanpa path rewrite) - HARUS DULUAN
+// Proxy untuk static files portal (tanpa path rewrite)
 app.use('/static', createProxyMiddleware({
-    target: 'http://localhost:3000/static', // Portaldata-fe running on port 3000
-    changeOrigin: true,
-    secure: false,
-    pathRewrite: {
-        '^/portal/static': '/static', // Redirect /portal/static to /static in backend
-    },
-    onError: (err, req, res) => {
-        console.error('Proxy error for /portal/static:', err.message);
-        res.status(500).json({ error: 'Proxy error', message: err.message });
-    },
-    logLevel: 'debug',
-    onProxyReq: (proxyReq, req, res) => {
-        console.log(`Proxying static portal ${req.method} ${req.url} to ${proxyReq.path}`);
-    }
+  target: 'http://localhost:3000/static',
+  changeOrigin: true,
+  secure: false,
+  pathRewrite: {
+    '^/portal/static': '/static',
+  },
+  onError: (err, req, res) => {
+    console.error('Proxy error for /portal/static:', err.message);
+    res.status(500).json({ error: 'Proxy error', message: err.message });
+  },
+  logLevel: 'debug',
+  onProxyReq: (proxyReq, req, res) => {
+    console.log(`Proxying static portal ${req.method} ${req.url} to ${proxyReq.path}`);
+  }
 }));
 
 // Proxy untuk portaldata-fe
 app.use('/portal', createProxyMiddleware({
-    target: 'http://localhost:3000', // Portaldata-fe running on port 3000
-    changeOrigin: true,
-    secure: false,
-    pathRewrite: {
-        '^/': '/', // Redirect /portal to / in backend
-    },
-    onError: (err, req, res) => {
-        console.error('Proxy error for /portal:', err.message);
-        res.status(500).json({ error: 'Proxy error', message: err.message });
-    },
-    logLevel: 'debug',
-    onProxyReq: (proxyReq, req, res) => {
-        console.log(`Proxying portal ${req.method} ${req.url} to ${proxyReq.path}`);
-    }
+  target: 'http://localhost:3000',
+  changeOrigin: true,
+  secure: false,
+  pathRewrite: {
+    '^/': '/',
+  },
+  onError: (err, req, res) => {
+    console.error('Proxy error for /portal:', err.message);
+    res.status(500).json({ error: 'Proxy error', message: err.message });
+  },
+  logLevel: 'debug',
+  onProxyReq: (proxyReq, req, res) => {
+    console.log(`Proxying portal ${req.method} ${req.url} to ${proxyReq.path}`);
+  }
 }));
-// Proxy untuk portaldata-fe
+
+// Proxy untuk portaldata-be
 app.use('/portal-be', createProxyMiddleware({
-    target: 'http://localhost:5000', // Portaldata-fe running on port 3000
-    changeOrigin: true,
-    secure: false,
-    pathRewrite: {
-        '^/': '/', // Redirect /portal to / in backend
-    },
-    onError: (err, req, res) => {
-        console.error('Proxy error for /portal:', err.message);
-        res.status(500).json({ error: 'Proxy error', message: err.message });
-    },
-    logLevel: 'debug',
-    onProxyReq: (proxyReq, req, res) => {
-        console.log(`Proxying portal ${req.method} ${req.url} to ${proxyReq.path}`);
-    }
+  target: 'http://localhost:5000',
+  changeOrigin: true,
+  secure: false,
+  pathRewrite: {
+    '^/': '/',
+  },
+  onError: (err, req, res) => {
+    console.error('Proxy error for /portal:', err.message);
+    res.status(500).json({ error: 'Proxy error', message: err.message });
+  },
+  logLevel: 'debug',
+  onProxyReq: (proxyReq, req, res) => {
+    console.log(`Proxying portal ${req.method} ${req.url} to ${proxyReq.path}`);
+  }
 }));
 
 // Redirect /peta to /gis/peta
 app.use('/peta', (req, res) => {
-    const newUrl = `/gis/peta${req.url}`;
-    console.log(`Redirecting ${req.url} to ${newUrl}`);
-    res.redirect(newUrl);
+  const newUrl = `/gis/peta${req.url}`;
+  console.log(`Redirecting ${req.url} to ${newUrl}`);
+  res.redirect(newUrl);
 });
 
-// Proxy untuk GIS service (termasuk static files)
+// Proxy untuk GIS service
 app.use('/gis', createProxyMiddleware({
-    target: 'http://localhost:9100', // GIS service running on port 9100
-    changeOrigin: true,
-    secure: false,
-    pathRewrite: {
-        '^/gis': '/peta', // Redirect /gis to /peta in backend
-    },
-    onError: (err, req, res) => {
-        console.error('Proxy error for /gis:', err.message);
-        res.status(500).json({ error: 'Proxy error', message: err.message });
-    },
-    logLevel: 'debug',
-    onProxyReq: (proxyReq, req, res) => {
-        console.log(`Proxying ${req.method} ${req.url} to ${proxyReq.path}`);
-    }
+  target: 'http://localhost:9100',
+  changeOrigin: true,
+  secure: false,
+  pathRewrite: {
+    '^/gis': '/peta',
+  },
+  onError: (err, req, res) => {
+    console.error('Proxy error for /gis:', err.message);
+    res.status(500).json({ error: 'Proxy error', message: err.message });
+  },
+  logLevel: 'debug',
+  onProxyReq: (proxyReq, req, res) => {
+    console.log(`Proxying ${req.method} ${req.url} to ${proxyReq.path}`);
+  }
 }));
 
-// Proxy untuk GIS service (termasuk static files)
+// Proxy GIS-BE
 app.use('/gis-be', createProxyMiddleware({
-    target: 'http://localhost:9000', // GIS service running on port 9100
-    changeOrigin: true,
-    secure: false,
-    pathRewrite: {
-        '^/': '/', // Redirect /gis to /peta in backend
-    },
-    onError: (err, req, res) => {
-        console.error('Proxy error for /gis:', err.message);
-        res.status(500).json({ error: 'Proxy error', message: err.message });
-    },
-    logLevel: 'debug',
-    onProxyReq: (proxyReq, req, res) => {
-        console.log(`Proxying ${req.method} ${req.url} to ${proxyReq.path}`);
-    }
+  target: 'http://localhost:9000',
+  changeOrigin: true,
+  secure: false,
+  pathRewrite: {
+    '^/': '/',
+  },
+  onError: (err, req, res) => {
+    console.error('Proxy error for /gis:', err.message);
+    res.status(500).json({ error: 'Proxy error', message: err.message });
+  },
+  logLevel: 'debug',
+  onProxyReq: (proxyReq, req, res) => {
+    console.log(`Proxying ${req.method} ${req.url} to ${proxyReq.path}`);
+  }
 }));
-// Proxy untuk static files dengan /peta di belakang
+
+// Proxy static files dari /peta
 app.use('/peta', createProxyMiddleware({
-    target: 'http://localhost:9100/peta', // GIS service running on port 9100 dengan /peta
-    changeOrigin: true,
-    secure: false,
-    onError: (err, req, res) => {
-        console.error('Proxy error for /peta:', err.message);
-        res.status(500).json({ error: 'Proxy error', message: err.message });
-    },
-    logLevel: 'debug',
-    onProxyReq: (proxyReq, req, res) => {
-        console.log(`Proxying static ${req.method} ${req.url} to ${proxyReq.path}`);
-    }
+  target: 'http://localhost:9100/peta',
+  changeOrigin: true,
+  secure: false,
+  onError: (err, req, res) => {
+    console.error('Proxy error for /peta:', err.message);
+    res.status(500).json({ error: 'Proxy error', message: err.message });
+  },
+  logLevel: 'debug',
+  onProxyReq: (proxyReq, req, res) => {
+    console.log(`Proxying static ${req.method} ${req.url} to ${proxyReq.path}`);
+  }
 }));
 
 // Proxy untuk login service
 app.use('/login', createProxyMiddleware({
-    target: 'http://localhost:1225', // Login service running on port 1225
-    changeOrigin: true,
-    secure: false,
-    pathRewrite: {
-        '^/login': '/', // Redirect /login to / in backend
-    },
-    onError: (err, req, res) => {
-        console.error('Proxy error for /login:', err.message);
-        res.status(500).json({ error: 'Proxy error', message: err.message });
-    },
-    logLevel: 'debug',
-    onProxyReq: (proxyReq, req, res) => {
-        console.log(`Proxying login ${req.method} ${req.url} to ${proxyReq.path}`);
-    }
+  target: 'http://localhost:1225',
+  changeOrigin: true,
+  secure: false,
+  pathRewrite: {
+    '^/login': '/',
+  },
+  onError: (err, req, res) => {
+    console.error('Proxy error for /login:', err.message);
+    res.status(500).json({ error: 'Proxy error', message: err.message });
+  },
+  logLevel: 'debug',
+  onProxyReq: (proxyReq, req, res) => {
+    console.log(`Proxying login ${req.method} ${req.url} to ${proxyReq.path}`);
+  }
 }));
 
-// Proxy untuk portaldata-be API
+// Proxy API BE
 app.use('/api', createProxyMiddleware({
-    target: 'http://localhost:5000', // Portaldata-be running on port 5000
+  target: 'http://localhost:5000',
+  changeOrigin: true,
+  secure: false,
+  pathRewrite: {
+    '^/api': '/api',
+  },
+  onError: (err, req, res) => {
+    console.error('Proxy error for /api:', err.message);
+    res.status(500).json({ error: 'Proxy error', message: err.message });
+  },
+  logLevel: 'debug',
+  onProxyReq: (proxyReq, req, res) => {
+    console.log(`Proxying API ${req.method} ${req.url} to ${proxyReq.path}`);
+  }
+}));
+
+// Default proxy ke login jika bukan ke portal/gis/api
+app.use('/', (req, res, next) => {
+  if (
+    req.path === '/health' ||
+    req.path.startsWith('/portal') ||
+    req.path.startsWith('/static') ||
+    req.path.startsWith('/api')
+  ) {
+    return next();
+  }
+
+  const proxy = createProxyMiddleware({
+    target: 'http://localhost:1225',
     changeOrigin: true,
     secure: false,
-    pathRewrite: {
-        '^/api': '/api', // Keep /api path
-    },
     onError: (err, req, res) => {
-        console.error('Proxy error for /api:', err.message);
-        res.status(500).json({ error: 'Proxy error', message: err.message });
+      console.error('Proxy error for static files:', err.message);
+      res.status(500).json({ error: 'Proxy error', message: err.message });
     },
     logLevel: 'debug',
     onProxyReq: (proxyReq, req, res) => {
-        console.log(`Proxying API ${req.method} ${req.url} to ${proxyReq.path}`);
+      console.log(`Proxying static ${req.method} ${req.url} to ${proxyReq.path}`);
     }
-}));
+  });
 
-// Proxy untuk static files login (kecuali health check, portal, dan static)
-app.use('/', (req, res, next) => {
-    if (req.path === '/health' || req.path.startsWith('/portal') || req.path.startsWith('/static') || req.path.startsWith('/api')) {
-        return next();
-    }
-    
-    const proxy = createProxyMiddleware({
-        target: 'http://localhost:1225', // Login service running on port 1225
-        changeOrigin: true,
-        secure: false,
-        onError: (err, req, res) => {
-            console.error('Proxy error for static files:', err.message);
-            res.status(500).json({ error: 'Proxy error', message: err.message });
-        },
-        logLevel: 'debug',
-        onProxyReq: (proxyReq, req, res) => {
-            console.log(`Proxying static ${req.method} ${req.url} to ${proxyReq.path}`);
-        }
-    });
-    
-    proxy(req, res, next);
+  proxy(req, res, next);
 });
 
 const PORT = process.env.PORT || 9200;
 
-// Mulai server berdasarkan ketersediaan SSL
 if (useHttps) {
-    https.createServer(sslOptions, app).listen(PORT, () => {
-        console.log(`✅ HTTPS Proxy server running on https://localhost:${PORT}`);
-    });
+  https.createServer(sslOptions, app).listen(PORT, () => {
+    console.log(`✅ HTTPS Proxy server running on https://localhost:${PORT}`);
+  });
 } else {
-    http.createServer(app).listen(PORT, () => {
-        console.log(`✅ HTTP Proxy server running on http://localhost:${PORT}`);
-        console.log('⚠️  SSL certificates not found, running in HTTP mode');
-    });
+  http.createServer(app).listen(PORT, () => {
+    console.log(`✅ HTTP Proxy server running on http://localhost:${PORT}`);
+    console.log('⚠️  SSL certificates not found, running in HTTP mode');
+  });
 }
