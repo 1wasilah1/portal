@@ -9,6 +9,7 @@ const path = require('path');
 // Import auth routes
 const authRoutes = require('./routes/auth');
 const adminAuthRoutes = require('./routes/adminAuth');
+const sukuDinasRoutes = require('./routes/sukuDinas');
 
 const corsOptions = {
   origin: '*', // Mengizinkan semua origin
@@ -43,6 +44,8 @@ app.get('/health', (req, res) => {
 // Auth routes
 app.use('/login', authRoutes);
 app.use('/login', adminAuthRoutes);
+// Suku dinas routes
+app.use('/api/suku-dinas', sukuDinasRoutes);
 
 // Proxy untuk static files portal (tanpa path rewrite) - HARUS DULUAN
 app.use('/static', createProxyMiddleware({
