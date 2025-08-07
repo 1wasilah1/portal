@@ -10,7 +10,12 @@
         </div>
     </div>
     
-    <!-- map control -->
+    <div class="tools">
+        <button @click="toggleLayerList" id="btn-layer-list" class="btn rounded-circle logo" title="Daftar Data">
+            <img v-if="!isLayerListVisible" :src="visibleIcon" alt="Show Layer List" class="icon"/>
+            <i v-else class="fas fa-times icon-close"></i>
+        </button>
+    </div>
     <div>
         <button @click="toggleBasemapList" class="btn-basemap">
             <img :src="selectedBasemapImage" alt="Selected Basemap" />
@@ -20,9 +25,9 @@
         <MousePosition v-if="mapInstance" :map="mapInstance" />
         <ZoomButton v-if="mapInstance" :map="mapInstance" />
         <HomeButton v-if="mapInstance" :map="mapInstance" />
+        <mapeditor v-if="mapInstance" :map="mapInstance" />
         <FeatureInfo v-if="mapInstance && overlayGroups" :map="mapInstance" :overlaygroup="overlayGroups" />
-        <LayerList v-if="mapInstance && overlayGroups" :map="mapInstance" :overlaygroup="overlayGroups" :layers="vectorLayers" />
-        <!-- <LayerList1 v-if="mapInstance && overlayGroups && isLayerListVisible" :map="mapInstance" :overlaygroup="overlayGroups" :layers="vectorLayers" /> -->
+        <LayerList v-if="mapInstance && overlayGroups && isLayerListVisible" :map="mapInstance" :overlaygroup="overlayGroups" :layers="vectorLayers" />
         <BasemapList v-if="mapInstance && overlayGroups && isBasemapListVisible"
                      :map="mapInstance"
                      :overlaygroup="overlayGroups"
@@ -31,7 +36,6 @@
                      @close="isBasemapListVisible = false"/>
         <SearchFeature v-if="mapInstance && overlayGroups" :map="mapInstance" :overlaygroup="overlayGroups" :layers="vectorLayers" />
         <FullscreenToggle v-if="mapInstance" />
-        <FilterSearch v-if="mapInstance" :map="mapInstance" />
         <!-- <pdf v-if="mapInstance" :mapContainerId="'map'" :fileName="'map-export.pdf'" :pdfTitle="'Map Export'" /> -->
         <Header v-if="mapInstance" />
         <geolocation v-if="mapInstance"
@@ -55,10 +59,14 @@ import 'ol/ol.css';
 
 import { ref, onMounted, provide } from 'vue';
 import { Map, View } from 'ol';
-import { ScaleLine } from 'ol/control';
-import { Tile as TileLayer } from 'ol/layer';
-import { fromLonLat } from 'ol/proj';
+import { ScaleLine } from 'ol/control.js';
+import { Tile as TileLayer } from 'ol/layer.js';
+import { fromLonLat } from 'ol/proj.js';
 import { TileWMS } from 'ol/source.js';
+
+//add mapeditor
+import { MapEditor } from './mapeditor.vue';
+
 
 import Header from './Header.vue';
 import MousePosition from './MousePosition.vue';
@@ -68,7 +76,6 @@ import FullscreenToggle from './fullscreen.vue';
 // import pdf from './pdf.vue';
 import FeatureInfo from './FeatureInfo.vue';
 import LayerList from './LayerList.vue';
-// import LayerList1 from './LayerList1.vue';
 import BasemapList from './BasemapList.vue';
 import SearchFeature from './SearchFeature.vue';
 import Geolocation from './geolocation.vue';
@@ -76,8 +83,7 @@ import Geolocation from './geolocation.vue';
 import { fetchLayer } from './fetchLayer.js'
 
 import layerGroupIcon from '../assets/layers-group.svg';
-import defaultBasemap from '../assets/basemap2.png';
-import FilterSearch from './FilterSearch.vue';
+import defaultBasemap from '../assets/basemap0.png';
 // import Sidebar from './Sidebar.vue';
 
 const mapInstance = ref(null);
@@ -321,6 +327,34 @@ onMounted(async () => {
         controls: [],
     });
 
+    // Add click event listener to map
+    mapInstance.value.on('click', (event) => {
+        // Get coordinates from click event
+        const coordinates = mapInstance.value.getCoordinateFromPixel(event.pixel);
+        const lonLat = fromLonLat(coordinates, 'EPSG:4326');
+        
+        // Convert to latitude and longitude
+        const longitude = coordinates[0];
+        const latitude = coordinates[1];
+        
+        // Check if user is logged in
+        const userEmail = localStorage.getItem('userEmail');
+        
+        if (userEmail) {
+            // User is logged in, save coordinates and redirect to progress page
+            const coordData = {
+                lat: latitude,
+                lng: longitude
+            };
+            localStorage.setItem('coordinates', JSON.stringify(coordData));
+            window.location.href = '/login/citizen/progress';
+        } else {
+            // User is not logged in, redirect to register page with coordinates
+            const loginUrl = `/login/citizen/register?lat=${latitude}&lng=${longitude}`;
+            window.location.href = loginUrl;
+        }
+    });
+
     mapInstance.value.addControl(new ScaleLine({ bar: true, text: false }));
     overlayGroups.value = await fetchLayer();
     overlayGroups.value.forEach(group => mapInstance.value.addLayer(group));
@@ -422,7 +456,7 @@ onMounted(async () => {
     max-height: 55px;
     aspect-ratio: 1 / 1;
     right: 1vw;
-    bottom: 2vh;
+    bottom: 1vh;
     z-index: 998;
     position: absolute;
     display: flex;
@@ -434,8 +468,8 @@ onMounted(async () => {
 
 .btn-basemap img {
     border: 2px solid white;
-    width: 80px;               /* Keep the image dimensions */
-    height: 80px;
+    width: 50px;               /* Keep the image dimensions */
+    height: 50px;
     border-radius: 10px;
 }
 
@@ -447,12 +481,12 @@ onMounted(async () => {
 .btn.logo,
 .btn.logo:active:focus {
   background-color: white;
-  margin-left: 10px;
+  margin-left: 0.5vw;
   width: 10vw;
   height: 10vw;
-  max-width: 50px;
-  max-height: 50px;
-  border-radius: 8px;
+  max-width: 40px;
+  max-height: 40px;
+  border-radius: 50%;
   border: 2px solid transparent;
   display: flex;
   justify-content: center;
@@ -468,16 +502,16 @@ onMounted(async () => {
 
 .icon {
   height: 4vw;
-  max-height: 30px;
+  max-height: 20px;
   width: auto;
 }
 
-/* .tools {
+.tools {
     position: absolute;
     z-index: 1;
-    top: 160px;
+    top: 150px;
     left: 0px;
-} */
+}
 
 /* Responsif tambahan untuk layar kecil */
 @media (max-width: 768px) {
@@ -490,12 +524,15 @@ onMounted(async () => {
     height: 5vw;
   }
 
-  /* .tools {
+  .tools {
     top: 22vh;
     left: 2vw;
-  } */
+  }
 
-  
+  :deep(.ol-zoom-in),
+  :deep(.ol-zoom-out) {
+    font-size: 1rem;
+  }
 }
 
 @media (max-width: 480px) {
