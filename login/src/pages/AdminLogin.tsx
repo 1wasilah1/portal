@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 export const AdminLogin = () => {
   const [username, setUsername] = useState('');
@@ -52,6 +53,8 @@ export const AdminLogin = () => {
         if (contentType && contentType.includes('application/json')) {
           const data = await response.json();
           console.log('Login successful:', data);
+          Cookies.set('accessToken', '1', { expires: 1 })
+          Cookies.set('refreshToken', '1', { expires: 7 })
           
           // Store admin data in localStorage (backup for development)
           localStorage.setItem('admin_login', 'true');
