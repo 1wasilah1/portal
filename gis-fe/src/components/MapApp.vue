@@ -203,28 +203,28 @@ onMounted(async () => {
     
     // Check for internal authentication (HTTP-only cookies)
     try {
-        console.log('Making request to /admin/verify');
-        console.log('Current location:', window.location.href);
-        console.log('Current origin:', window.location.origin);
+       // console.log('Making request to /admin/verify');
+       // console.log('Current location:', window.location.href);
+       // console.log('Current origin:', window.location.origin);
         
         // Use proxy URL for admin verification
-        let response;
-        let usedUrl = '/admin/verify';
+       // let response;
+       // let usedUrl = '/admin/verify';
         
-        console.log('Using proxy URL:', usedUrl);
-        response = await fetch(usedUrl, {
-            method: 'GET',
-            credentials: 'include', // Include cookies
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+       // console.log('Using proxy URL:', usedUrl);
+      //  response = await fetch(usedUrl, {
+      //      method: 'GET',
+      //      credentials: 'include', // Include cookies
+       //     headers: {
+        //        'Content-Type': 'application/json'
+         //   }
+        //});
         
-        console.log('Used URL:', usedUrl);
+        //console.log('Used URL:', usedUrl);
         
-        console.log('Response status:', response.status);
-        console.log('Response ok:', response.ok);
-        console.log('Response headers:', response.headers);
+        //console.log('Response status:', response.status);
+        //console.log('Response ok:', response.ok);
+        //console.log('Response headers:', response.headers);
         
         if (response.ok) {
             const data = await response.json();
@@ -328,32 +328,32 @@ onMounted(async () => {
     });
 
     // Add click event listener to map
-    mapInstance.value.on('click', (event) => {
-        // Get coordinates from click event
-        const coordinates = mapInstance.value.getCoordinateFromPixel(event.pixel);
-        const lonLat = fromLonLat(coordinates, 'EPSG:4326');
+   // mapInstance.value.on('click', (event) => {
+    //    // Get coordinates from click event
+     //   const coordinates = mapInstance.value.getCoordinateFromPixel(event.pixel);
+      //  const lonLat = fromLonLat(coordinates, 'EPSG:4326');
         
-        // Convert to latitude and longitude
-        const longitude = coordinates[0];
-        const latitude = coordinates[1];
+      //  // Convert to latitude and longitude
+      //  const longitude = coordinates[0];
+       // const latitude = coordinates[1];
         
         // Check if user is logged in
-        const userEmail = localStorage.getItem('userEmail');
+       // const userEmail = localStorage.getItem('userEmail');
         
-        if (userEmail) {
+       // if (userEmail) {
             // User is logged in, save coordinates and redirect to progress page
-            const coordData = {
-                lat: latitude,
+       //     const coordData = {
+        //        lat: latitude,
                 lng: longitude
-            };
-            localStorage.setItem('coordinates', JSON.stringify(coordData));
-            window.location.href = '/login/citizen/progress';
-        } else {
+        //    };
+         //   localStorage.setItem('coordinates', JSON.stringify(coordData));
+         //   window.location.href = '/login/citizen/progress';
+        //} else {
             // User is not logged in, redirect to register page with coordinates
-            const loginUrl = `/login/citizen/register?lat=${latitude}&lng=${longitude}`;
-            window.location.href = loginUrl;
-        }
-    });
+         //   const loginUrl = `/login/citizen/register?lat=${latitude}&lng=${longitude}`;
+          //  window.location.href = loginUrl;
+       // }
+    //});
 
     mapInstance.value.addControl(new ScaleLine({ bar: true, text: false }));
     overlayGroups.value = await fetchLayer();
