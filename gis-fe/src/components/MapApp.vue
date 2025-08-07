@@ -204,18 +204,18 @@ onMounted(async () => {
         
         // Use proxy URL for admin verification
         let response;
-        let usedUrl = '/admin/verify';
+        //let usedUrl = '/admin/verify';
         
-        console.log('Using proxy URL:', usedUrl);
-        response = await fetch(usedUrl, {
-            method: 'GET',
-            credentials: 'include', // Include cookies
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        //console.log('Using proxy URL:', usedUrl);
+      //  response = await fetch(usedUrl, {
+        //     method: 'GET',
+        //     credentials: 'include', // Include cookies
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     }
+        // });
         
-        console.log('Used URL:', usedUrl);
+       // console.log('Used URL:', usedUrl);
         
         console.log('Response status:', response.status);
         console.log('Response ok:', response.ok);
