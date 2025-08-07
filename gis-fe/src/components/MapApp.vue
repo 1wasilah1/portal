@@ -65,7 +65,7 @@ import { fromLonLat } from 'ol/proj.js';
 import { TileWMS } from 'ol/source.js';
 
 //add mapeditor
-import { MapEditor } from './mapeditor.vue';
+import MapEditor from './mapeditor.vue';
 
 
 import Header from './Header.vue';
@@ -344,7 +344,7 @@ onMounted(async () => {
             // User is logged in, save coordinates and redirect to progress page
        //     const coordData = {
         //        lat: latitude,
-                lng: longitude
+                // lng: longitude
         //    };
          //   localStorage.setItem('coordinates', JSON.stringify(coordData));
          //   window.location.href = '/login/citizen/progress';
