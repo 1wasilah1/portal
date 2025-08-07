@@ -798,14 +798,14 @@ export const AdminDashboard = () => {
           <div className="flex gap-2">
             {/* <Button variant="outline" onClick={checkCookieStatus} size="sm">
               Check Cookies
-            </Button>
+            </Button> */}
             <Button variant="outline" onClick={simulateAdminLogin} size="sm" className="bg-blue-500 text-white">
               Simulasi Admin
             </Button>
             <Button variant="outline" onClick={simulateExternalUser} size="sm" className="bg-green-500 text-white">
               Simulasi Eksternal
             </Button>
-            <Button variant="outline" onClick={simulatePublicUser} size="sm" className="bg-orange-500 text-white">
+            {/* <Button variant="outline" onClick={simulatePublicUser} size="sm" className="bg-orange-500 text-white">
               Simulasi Public
             </Button>
             <Button variant="outline" onClick={testToast} size="sm" className="bg-purple-500 text-white">
