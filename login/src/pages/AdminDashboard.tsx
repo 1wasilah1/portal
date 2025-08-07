@@ -157,7 +157,9 @@ export type SukuDinasType = {
 export const AdminDashboard = () => {
   const [suggestions, setSuggestions] = useState(mockSuggestions);
   const [citizens, setCitizens] = useState(mockCitizens);
-  const [dataLaporanSukuDinas, setLaporanSukuDinas] = useState<SukuDinasType[]>([]);
+  const [dataLaporanSukuDinas, setLaporanSukuDinas] = useState<SukuDinasType[]>(
+    []
+  );
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [adminData, setAdminData] = useState(null);
@@ -734,12 +736,12 @@ export const AdminDashboard = () => {
     setIsModalOpen(false);
   };
 
-  const rupiah = (number)=>{
+  const rupiah = (number) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
-      currency: "IDR"
+      currency: "IDR",
     }).format(number);
-  }
+  };
 
   // Show loading state while verifying authentication
   if (isLoading) {
@@ -799,10 +801,20 @@ export const AdminDashboard = () => {
             {/* <Button variant="outline" onClick={checkCookieStatus} size="sm">
               Check Cookies
             </Button> */}
-            <Button variant="outline" onClick={simulateAdminLogin} size="sm" className="bg-blue-500 text-white">
+            <Button
+              variant="outline"
+              onClick={simulateAdminLogin}
+              size="sm"
+              className="bg-blue-500 text-white"
+            >
               Simulasi Admin
             </Button>
-            <Button variant="outline" onClick={simulateExternalUser} size="sm" className="bg-green-500 text-white">
+            <Button
+              variant="outline"
+              onClick={simulateExternalUser}
+              size="sm"
+              className="bg-green-500 text-white"
+            >
               Simulasi Eksternal
             </Button>
             {/* <Button variant="outline" onClick={simulatePublicUser} size="sm" className="bg-orange-500 text-white">
@@ -823,7 +835,7 @@ export const AdminDashboard = () => {
             <Button
               variant="outline"
               onClick={() => {
-                window.location.href = "/gis-fe";
+                window.open("/gis-fe", "_blank");
               }}
               size="sm"
               className="bg-blue-500 text-white"
@@ -833,7 +845,7 @@ export const AdminDashboard = () => {
             <Button
               variant="outline"
               onClick={() => {
-                window.location.href = "/portal";
+                window.open("/portal", "_blank");
               }}
               size="sm"
               className="bg-blue-500 text-white"
