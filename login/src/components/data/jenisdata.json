@@ -1,0 +1,274 @@
+[
+  {
+    "cat": "Rumah",
+    "key": "Rumah tidak layak huni"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Jalan Lingkungan"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Trotoar"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Drainase Lingkungan"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Penerangan Jalan Umum"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Septitank Komunal"
+  },
+  {
+    "cat": "Fisik",
+    "key": "IPAL Komunal"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Hydrant"
+  },
+  {
+    "cat": "Fisik",
+    "key": "APAR"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Box Hydrant"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Instalasi Siamise"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Pot Tanaman & Tanaman"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Instalasi Vertikal Garden"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Tanaman Vertikal Garden"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Taman Lingkungan"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Menara Penyiraman Vertikal Garden"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Hutan Kota"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Besi Tanaman Rambat"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Biopori"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Pemeliharaan RTH"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Tong Sampah"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Gerobak Sampah"
+  },
+  {
+    "cat": "Fisik",
+    "key": "TPS"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Renovasi/Pembangunan Sarana Pemerintahan dan Pelayanan Umum"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Renovasi/Pembangunan Sarana Pendidikan dan Pembelajaran"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Renovasi/Pembangunan Sarana Olahraga"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Renovasi/Pembangunan Sarana Kesehatan"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Renovasi/Pembangunan Sarana Peribadatan"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Renovasi/Pembangunan Sarana Kebudayaan dan Rekreasi"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Renovasi/Pembangunan Sarana Ruang Terbuka, Taman dan Lap. Olahraga"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Renovasi/Pembangunan Jembatan"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Jalur Refleksi"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Gapura"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Papan Nama Jalan"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Signage Lain"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Gerbang/Pagar"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Plat Nomor Rumah"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Bangku"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Pengecetan Tutup Saluran"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Pengecetan Marka Jalan"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Pengecetan Rumah Warga"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Mural"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Pengecetan Jalan Dinding"
+  },
+  {
+    "cat": "Fisik",
+    "key": "CCTV"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Cermin Cembung"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Speed Bumb"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Guilding Block"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Pemasangan Railing"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Honorarium Pokmas"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Laporan Pokmas"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Jasa Konsultansi Perencanaan"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Jasa Konsultansi Pengawasan"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Fasilitas PKL"
+  },
+  {
+    "cat": "Fisik",
+    "key": "Renovasi/Pembangunan Sarana Perdagangan dan Niaga"
+  },
+  {
+    "cat": "Sosial",
+    "key": "PAUD"
+  },
+  {
+    "cat": "Sosial",
+    "key": "Sekolah Kejuruan"
+  },
+  {
+    "cat": "Sosial",
+    "key": "Klinik dan Dokter Jaga"
+  },
+  {
+    "cat": "Sosial",
+    "key": "Kegiatan Sosial Masyarakat"
+  },
+  {
+    "cat": "Sosial",
+    "key": "Program Penyuluhan dan Pendampingan"
+  },
+  {
+    "cat": "Sosial",
+    "key": "Keterlibatan perempuan dalam organisasi lingkungan"
+  },
+  {
+    "cat": "Sosial",
+    "key": "Program inklusi sosial dan pendampingan pengangguran dan sektor informal"
+  },
+  {
+    "cat": "Sosial",
+    "key": "Kegiatan budaya dan olahraga masyarakat"
+  },
+  {
+    "cat": "Sosial",
+    "key": "Platform pendampingan layanan kependudukan (administrasi, KB, dll)"
+  },
+  {
+    "cat": "Ekonomi",
+    "key": "Platform Pelatihan Ketenagakerjaan"
+  },
+  {
+    "cat": "Ekonomi",
+    "key": "Platform Informasi Ketenagakerjaan"
+  },
+  {
+    "cat": "Ekonomi",
+    "key": "Program Pelatihan Kewirausahaan"
+  },
+  {
+    "cat": "Ekonomi",
+    "key": "Platform Jejaring Kewirausahaan"
+  },
+  {
+    "cat": "Ekonomi",
+    "key": "Platform keuangan mikro (koperasi, LSP, Lembaga Dana Bergulir, dll)"
+  }
+]

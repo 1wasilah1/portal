@@ -1,0 +1,78 @@
+[
+  {
+    "id": "1",
+    "title": "Perbaikan Jalan Rusak di RT 05",
+    "submittedDate": "15 Jan 2024",
+    "steps": [
+      {
+        "id": "1",
+        "title": "Pengajuan Diterima",
+        "description":
+          "Saran Anda telah berhasil dikirim dan diterima oleh sistem",
+        "status": "completed",
+        "date": "15 Jan 2024"
+      },
+      {
+        "id": "2",
+        "title": "Verifikasi Data",
+        "description":
+          "Tim verifikasi sedang memeriksa kelengkapan dan validitas pengajuan",
+        "status": "completed",
+        "date": "16 Jan 2024"
+      },
+      {
+        "id": "3",
+        "title": "Review oleh Admin",
+        "description":
+          "Admin sedang melakukan review mendalam terhadap pengajuan Anda",
+        "status": "active",
+        "date": ""
+      },
+      {
+        "id": "4",
+        "title": "Rekomendasi",
+        "description": "Usulan akan diajukan untuk dianggarkan",
+        "status": "pending",
+        "date": ""
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "title": "Pengadaan Taman Bermain Anak",
+    "submittedDate": "10 Jan 2024",
+    "steps": [
+      {
+        "id": "1",
+        "title": "Pengajuan Diterima",
+        "description":
+          "Saran Anda telah berhasil dikirim dan diterima oleh sistem",
+        "status": "completed",
+        "date": "10 Jan 2024"
+      },
+      {
+        "id": "2",
+        "title": "Verifikasi Data",
+        "description":
+          "Tim verifikasi sedang memeriksa kelengkapan dan validitas pengajuan",
+        "status": "completed",
+        "date": "11 Jan 2024"
+      },
+      {
+        "id": "3",
+        "title": "Review oleh Admin",
+        "description": "Admin telah menyelesaikan review terhadap pengajuan Anda",
+        "status": "completed",
+        "date": "12 Jan 2024"
+      },
+      {
+        "id": "4",
+        "title": "Rekomendasi",
+        "description":
+          "Usulan akan diajukan untuk dianggarkan",
+        "status": "completed",
+        "date": "14 Jan 2024"
+      }
+    ]
+  }
+]
