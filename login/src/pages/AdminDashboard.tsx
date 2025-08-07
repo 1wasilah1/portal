@@ -19,6 +19,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { logTokenInfo, getTokenInfo } from '@/utils/auth';
 
 const mockSuggestions = [
   {
@@ -208,22 +209,40 @@ export const AdminDashboard = () => {
         const hasAccessToken = cookies.includes('accessToken');
         const hasRefreshToken = cookies.includes('refreshToken');
         const userData = localStorage.getItem('userData');
+        const adminLogin = localStorage.getItem('admin_login');
+        const hasAccessTokenFlag = localStorage.getItem('has_access_token') === 'true';
+        const hasRefreshTokenFlag = localStorage.getItem('has_refresh_token') === 'true';
+        const cookiesVerified = localStorage.getItem('cookies_verified');
         
-        console.log('Auth check:', { hasAccessToken, hasRefreshToken, userData: !!userData });
+        // Use utility function for detailed token logging
+        const tokenInfo = logTokenInfo();
+        
+        console.log('🔍 Additional Auth Check:');
+        console.log('  👤 User data:', { userData: !!userData });
+        console.log('  🏠 Admin login flag:', adminLogin === 'true');
         
         // Determine authentication type and show appropriate toast
-        if (hasAccessToken && hasRefreshToken) {
-          // Admin suku dinas - HTTP-only cookies present
-          console.log('Showing admin toast');
+        if (tokenInfo.cookiesInDocument.hasAccessToken && tokenInfo.cookiesInDocument.hasRefreshToken) {
+          // Admin suku dinas - HTTP-only cookies present and readable
+          console.log('✅ HTTP-only cookies detected and readable');
           console.log('🔵 ALERT: Admin Suku Dinas detected!');
           toast({
             title: "Admin Suku Dinas",
-            description: "Anda login sebagai admin suku dinas dengan HTTP-only cookies",
+            description: "Login berhasil dengan HTTP-only cookies",
+            className: "bg-blue-500 text-white",
+          });
+        } else if (tokenInfo.hasTokens) {
+          // Tokens were received (confirmed by API response)
+          console.log('✅ Access & Refresh tokens confirmed from API');
+          console.log('🔵 ALERT: Admin with verified tokens detected!');
+          toast({
+            title: "Admin Dashboard",
+            description: "Login berhasil dengan access & refresh tokens",
             className: "bg-blue-500 text-white",
           });
           
-          // Verify admin authentication
-          const response = await fetch('/login/admin/profile', {
+          // Verify admin authentication with API
+          const response = await fetch('/admin/profile', {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -232,17 +251,78 @@ export const AdminDashboard = () => {
           });
 
           if (response.ok) {
-            const data = await response.json();
-            setAdminData(data.data);
-            console.log('Admin authenticated:', data.data);
+            // Check if response is actually JSON
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+              const data = await response.json();
+              setAdminData(data.data);
+              console.log('Admin authenticated via API:', data.data);
+            } else {
+              console.warn('Admin profile endpoint returned non-JSON response');
+              // For now, set mock admin data since the endpoint might not be implemented
+              setAdminData({ 
+                username: localStorage.getItem('admin_username') || 'admin', 
+                role: 'admin' 
+              });
+            }
           } else {
-            console.log('Admin not authenticated, redirecting to login');
+            console.log('Admin API not authenticated, status:', response.status);
+            // Check if this is a development environment without backend
+            if (response.status === 404) {
+              console.log('Admin profile endpoint not found, using local auth data');
+              // Use local storage data for development
+              const adminUsername = localStorage.getItem('admin_username');
+              
+              if (adminLogin === 'true' && adminUsername) {
+                setAdminData({ 
+                  username: adminUsername, 
+                  role: 'admin' 
+                });
+                console.log('Using local admin authentication');
+              } else {
+                toast({
+                  title: "Akses Ditolak",
+                  description: "Silakan login terlebih dahulu",
+                  variant: "destructive",
+                });
+                navigate('/loginAdmin');
+                return;
+              }
+            } else {
+              toast({
+                title: "Akses Ditolak",
+                description: "Silakan login terlebih dahulu",
+                variant: "destructive",
+              });
+              navigate('/loginAdmin');
+              return;
+            }
+          }
+        } else if (adminLogin === 'true') {
+          // Admin login via localStorage only (fallback or development mode)
+          console.log('Showing admin localStorage toast');
+          console.log('🔵 ALERT: Admin LocalStorage detected!');
+          toast({
+            title: "Admin Dashboard",
+            description: "Anda login sebagai admin (development mode)",
+            className: "bg-blue-500 text-white",
+          });
+          
+          // Use localStorage data directly
+          const adminUsername = localStorage.getItem('admin_username');
+          if (adminUsername) {
+            setAdminData({ 
+              username: adminUsername, 
+              role: 'admin' 
+            });
+            console.log('Using localStorage admin data:', adminUsername);
+          } else {
             toast({
               title: "Akses Ditolak",
-              description: "Silakan login terlebih dahulu",
+              description: "Data admin tidak ditemukan",
               variant: "destructive",
             });
-            navigate('/admin/login');
+            navigate('/loginAdmin');
             return;
           }
         } else if (userData) {
@@ -277,7 +357,7 @@ export const AdminDashboard = () => {
           description: "Terjadi kesalahan saat verifikasi autentikasi",
           variant: "destructive",
         });
-        navigate('/admin/login');
+        navigate('/loginAdmin');
         return;
       } finally {
         setIsLoading(false);
@@ -346,7 +426,7 @@ export const AdminDashboard = () => {
     
     try {
       // Call proxy server logout endpoint
-      const response = await fetch('/login/admin/logout', {
+      const response = await fetch('/admin/logout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -385,7 +465,7 @@ export const AdminDashboard = () => {
     document.cookie = 'admin_login_time=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 
     // Redirect to login page
-    navigate('/admin/login');
+    navigate('/loginAdmin');
   };
 
   const getStatusBadge = (status: string) => {

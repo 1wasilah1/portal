@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Dependencies
 node_modules/
 npm-debug.log*
@@ -66,3 +67,7 @@ jspm_packages/
 .Trashes
 ehthumbs.db
 Thumbs.db 
+=======
+# Node.js
+node_modules/
+>>>>>>> eafb5cdbf3494c23e4d36f8efc1e4449c2a88344

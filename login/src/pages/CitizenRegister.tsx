@@ -30,7 +30,7 @@ export const CitizenRegister = () => {
     const storedUserEmail = localStorage.getItem('userEmail');
     if (storedUserEmail) {
       // User already logged in, redirect to progress page
-      navigate('/login/citizen/progress');
+              navigate('/progressCitizen');
     }
   }, [navigate]);
 
@@ -84,7 +84,7 @@ export const CitizenRegister = () => {
     localStorage.removeItem('coordinates');
     
     // Navigate to progress page
-    navigate('/citizen/progress');
+          navigate('/progressCitizen');
   };
 
   // Registration form state
@@ -129,7 +129,7 @@ export const CitizenRegister = () => {
     }
 
     try {
-      const response = await fetch('https://localhost:9200/login/citizen/register', {
+      const response = await fetch('https://localhost:9200/citizen/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -193,7 +193,7 @@ export const CitizenRegister = () => {
     }
 
     try {
-      const response = await fetch('https://localhost:9200/login/citizen/login', {
+      const response = await fetch('https://localhost:9200/citizen/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -225,10 +225,10 @@ export const CitizenRegister = () => {
             setShowLocationModal(true);
           } catch (error) {
             console.error('Error parsing coordinates:', error);
-            navigate('/citizen/progress');
+            navigate('/progressCitizen');
           }
         } else {
-          navigate('/citizen/progress');
+          navigate('/progressCitizen');
         }
       } else {
         toast({
@@ -354,7 +354,7 @@ export const CitizenRegister = () => {
           <div className="mt-6 text-center">
             <Button 
               variant="link" 
-              onClick={() => navigate('/admin/login')}
+              onClick={() => navigate('/loginAdmin')}
               className="text-sm"
             >
               ← Kembali ke login admin
@@ -451,7 +451,7 @@ export const CitizenRegister = () => {
               <Button variant="outline" onClick={() => {
                 setShowLocationModal(false);
                 localStorage.removeItem('coordinates');
-                navigate('/citizen/progress');
+                navigate('/progressCitizen');
               }}>
                 Lewati
               </Button>
