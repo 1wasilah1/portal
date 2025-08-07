@@ -9,7 +9,7 @@
             <button @click="closeAuthAlert" class="alert-close">×</button>
         </div>
     </div>
-    
+      <MapEditor />
     <div class="tools">
         <button @click="toggleLayerList" id="btn-layer-list" class="btn rounded-circle logo" title="Daftar Data">
             <img v-if="!isLayerListVisible" :src="visibleIcon" alt="Show Layer List" class="icon"/>
@@ -25,7 +25,7 @@
         <MousePosition v-if="mapInstance" :map="mapInstance" />
         <ZoomButton v-if="mapInstance" :map="mapInstance" />
         <HomeButton v-if="mapInstance" :map="mapInstance" />
-        <mapeditor v-if="mapInstance" :map="mapInstance" />
+        <MapEditor v-if="mapInstance" :map="mapInstance" />
         <FeatureInfo v-if="mapInstance && overlayGroups" :map="mapInstance" :overlaygroup="overlayGroups" />
         <LayerList v-if="mapInstance && overlayGroups && isLayerListVisible" :map="mapInstance" :overlaygroup="overlayGroups" :layers="vectorLayers" />
         <BasemapList v-if="mapInstance && overlayGroups && isBasemapListVisible"
