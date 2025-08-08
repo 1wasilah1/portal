@@ -135,7 +135,6 @@ import { Style, Fill, Stroke, Circle as CircleStyle } from 'ol/style';
 import GeoJSON from 'ol/format/GeoJSON';
 import { transform } from 'ol/proj';
 import { unByKey } from 'ol/Observable';
-import axios from 'axios';
 
 const props = defineProps({
   map: {
