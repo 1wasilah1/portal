@@ -428,9 +428,8 @@ const saveFeature = async () => {
     // const feature = selectedFeature;
     const props = { ...currentFeature.value.properties };
     delete props.geometry;
-    console.log('feature=>', props)
     const formData = new FormData();
-    formData.append('alamat', props.alamat);
+    formData.append('alamat', props.Alamat);
     formData.append('rw', props.RW);
     formData.append('kelurahan', props.Kelurahan);
     formData.append('kecamatan', props.Kecamatan);
@@ -444,7 +443,7 @@ const saveFeature = async () => {
     formData.append('nama_surveyor', props.Namasurveyor);
     // formData.append('foto', 'null');
 
-    const response = await fetch('https://10.15.38.162:9200/api/suku-dinas', {
+    const response = await fetch('/api/suku-dinas', {
       method: 'POST',
       body: formData
     });

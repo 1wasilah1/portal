@@ -631,22 +631,27 @@ export const AdminDashboard = () => {
       }
     }
 
-    const fetchDataSukuDinas = async () => {
-      try {
-        const res = await fetch(`/api/suku-dinas`);
-        const data = await res.json();
-        if (data) {
-          setLaporanSukuDinas(data?.data);
-        } else {
-          console.error("Gagal mengambil data");
-        }
-        console.log("isi data sukudinas->", data);
-      } catch (err) {
-        console.error("Gagal mengambil data:", err);
-      }
-    };
     fetchDataSukuDinas();
   }, []);
+
+  const fetchDataSukuDinas = async () => {
+    try {
+      const res = await fetch(`/api/suku-dinas`);
+      const data = await res.json();
+      if (data) {
+        setLaporanSukuDinas(data?.data);
+      } else {
+        console.error("Gagal mengambil data");
+      }
+      console.log("isi data sukudinas->", data);
+    } catch (err) {
+      console.error("Gagal mengambil data:", err);
+    }
+  };
+
+  const clickTab = () => {
+    fetchDataSukuDinas();
+  }
 
   //for handle submit form ajukan saran
   const handleNewSubmission = () => {
@@ -941,7 +946,7 @@ export const AdminDashboard = () => {
           <TabsList className="grid w-full grid-cols-3 lg:w-fit">
             <TabsTrigger value="suggestions">Pengajuan Saran</TabsTrigger>
             <TabsTrigger value="citizens">Data Warga</TabsTrigger>
-            <TabsTrigger value="sukudinas">Laporan Suku Dinas</TabsTrigger>
+            <TabsTrigger value="sukudinas" onClick={clickTab}>Laporan Suku Dinas</TabsTrigger>
           </TabsList>
 
           <TabsContent value="suggestions" className="space-y-6">
