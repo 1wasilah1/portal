@@ -806,7 +806,7 @@ export const AdminDashboard = () => {
             {/* <Button variant="outline" onClick={checkCookieStatus} size="sm">
               Check Cookies
             </Button> */}
-            <Button
+            {/* <Button
               variant="outline"
               onClick={simulateAdminLogin}
               size="sm"
@@ -821,7 +821,7 @@ export const AdminDashboard = () => {
               className="bg-green-500 text-white"
             >
               Simulasi Eksternal
-            </Button>
+            </Button> */}
             {/* <Button variant="outline" onClick={simulatePublicUser} size="sm" className="bg-orange-500 text-white">
               Simulasi Public
             </Button>
