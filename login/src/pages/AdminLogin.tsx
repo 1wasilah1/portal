@@ -113,9 +113,9 @@ export const AdminLogin = () => {
             localStorage.setItem('admin_login_time', new Date().toISOString());
             
             // Show info message to user
-            setTimeout(() => {
-              alert('Backend tidak tersedia - menggunakan mode development.\n\nLogin berhasil dengan fallback authentication.');
-            }, 100);
+            // setTimeout(() => {
+            //   alert('Backend tidak tersedia - menggunakan mode development.\n\nLogin berhasil dengan fallback authentication.');
+            // }, 100);
             
             navigate('/dashboardAdmin');
             return;
