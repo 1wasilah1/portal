@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { AdminLogin } from "./pages/AdminLogin";
@@ -11,7 +11,8 @@ const App = () => (
   <BrowserRouter>
     <Routes>
       {/* Home page */}
-      <Route path="/" element={<Index />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<Index />} />
       
       {/* Citizen routes */}
       <Route path="/loginCitizen" element={<CitizenRegister />} />
@@ -25,7 +26,8 @@ const App = () => (
       <Route path="/clear-cookies" element={<ClearCookies />} />
       
       {/* Catch all - must be last */}
-      <Route path="*" element={<NotFound />} />
+      {/* <Route path="*" element={<NotFound />} /> */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   </BrowserRouter>
 );

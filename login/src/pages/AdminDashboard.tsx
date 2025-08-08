@@ -1086,71 +1086,77 @@ export const AdminDashboard = () => {
 
           <TabsContent value="sukudinas" className="space-y-6">
             <div className="grid gap-6">
-              {dataLaporanSukuDinas.map((sudin) => (
-                <Card
-                  key={sudin.id}
-                  className="shadow-card hover:shadow-elegant transition-all duration-200"
-                >
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="text-lg text-foreground">
-                          {sudin?.nama_kegiatan.toLocaleUpperCase() ?? "-"}
-                        </CardTitle>
-                        <CardDescription>
-                          Tahun Pelaksanaan: {sudin?.tahun_pelaksanaan}
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <span>Nama Surveyor: &nbsp;</span>
-                          <span>{sudin.nama_surveyor ?? "-"}</span>
+              {dataLaporanSukuDinas && dataLaporanSukuDinas.length > 0 ? (
+                <>
+                  {dataLaporanSukuDinas.map((sudin) => (
+                    <Card
+                      key={sudin.id}
+                      className="shadow-card hover:shadow-elegant transition-all duration-200"
+                    >
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <CardTitle className="text-lg text-foreground">
+                              {sudin?.nama_kegiatan.toLocaleUpperCase() ?? "-"}
+                            </CardTitle>
+                            <CardDescription>
+                              Tahun Pelaksanaan: {sudin?.tahun_pelaksanaan}
+                            </CardDescription>
+                          </div>
                         </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <span>Anggaran: &nbsp;</span>
-                          <span>{rupiah(sudin.anggaran) ?? "0"}</span>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <span>Nama Surveyor: &nbsp;</span>
+                              <span>{sudin.nama_surveyor ?? "-"}</span>
+                            </div>
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <span>Anggaran: &nbsp;</span>
+                              <span>{rupiah(sudin.anggaran) ?? "0"}</span>
+                            </div>
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <span>Alamat: &nbsp;</span>
+                              <span>{sudin?.alamat ?? "-"}</span>
+                            </div>
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <span>Wilayah Administrasi: &nbsp;</span>
+                              <span>{sudin?.wilayah_administrasi ?? "-"}</span>
+                            </div>
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <span>Kelurahan: &nbsp;</span>
+                              <span>{sudin?.kelurahan ?? "-"}</span>
+                            </div>
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <span>Kecamatan: &nbsp;</span>
+                              <span>{sudin?.kecamatan ?? "-"}</span>
+                            </div>
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <span>RW: &nbsp;</span>
+                              <span>{sudin?.rw ?? "-"}</span>
+                            </div>
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <span>Tipe Bahan: &nbsp;</span>
+                              <span>{sudin.tipe_bahan}</span>
+                            </div>
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <span>Volume: &nbsp;</span>
+                              <span>{sudin.volume}</span>
+                            </div>
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <span>Satuan: &nbsp;</span>
+                              <span>{sudin.satuan}</span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <span>Alamat: &nbsp;</span>
-                          <span>{sudin?.alamat ?? "-"}</span>
-                        </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <span>Wilayah Administrasi: &nbsp;</span>
-                          <span>{sudin?.wilayah_administrasi ?? "-"}</span>
-                        </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <span>Kelurahan: &nbsp;</span>
-                          <span>{sudin?.kelurahan ?? "-"}</span>
-                        </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <span>Kecamatan: &nbsp;</span>
-                          <span>{sudin?.kecamatan ?? "-"}</span>
-                        </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <span>RW: &nbsp;</span>
-                          <span>{sudin?.rw ?? "-"}</span>
-                        </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <span>Tipe Bahan: &nbsp;</span>
-                          <span>{sudin.tipe_bahan}</span>
-                        </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <span>Volume: &nbsp;</span>
-                          <span>{sudin.volume}</span>
-                        </div>
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <span>Satuan: &nbsp;</span>
-                          <span>{sudin.satuan}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </>
+              ) : (
+                <div>Data Tidak Tersedia</div>
+              )}
             </div>
           </TabsContent>
         </Tabs>
