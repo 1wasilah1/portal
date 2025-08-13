@@ -44,7 +44,7 @@
 
       <div class="filter-group">
         <h3><i class="fas fa-map-pin"></i> Rukun Warga (RW)</h3>
-        <select v-model="selectedRukunWarga" @change="zoomToLocation" :disabled="!selectedKelurahan">
+        <select v-model="selectedRukunWarga" @change="applyFilters" :disabled="!selectedKelurahan">
           <option value="">Pilih Rukun Warga (RW)</option>
           <option v-for="kel in rukunWargaList" :key="kel.id" :value="kel">
             {{ kel.name }}
@@ -52,16 +52,32 @@
         </select>
       </div>
 
+      <div class="filter-group">
+        <h3><i class="fas fa-triangle-exclamation"></i> Kategori Kumuh</h3>
+        <select multiple v-model="selectedKumuh" size="5">
+          <option v-for="opt in kategoriKumuhList" :key="opt.id" :value="opt.name">
+            {{ opt.name }}
+          </option>
+        </select>
+        <small v-if="selectedKumuh.length">Dipilih: {{ selectedKumuh.join(', ') }}</small>
+      </div>
+
+
       <div class="button-reset-apply">
         <button class="reset-btn" @click="resetFilters">
           Reset Filter
         </button>
-        <button class="apply-btn" @click="applyFilters" :disabled="!selectedKota">
+        <button class="apply-btn" @click="applyFilters" :disabled="!selectedKota && selectedKumuh.length === 0">
           Apply Filter
         </button>
       </div>
     </div>
-
+      <!-- Toast / Popup -->
+      <div v-if="alert.visible" class="toast" :class="alert.type">
+        <i class="fas fa-circle-info"></i>
+        <span>{{ alert.text }}</span>
+        <button class="toast-close" @click="alert.visible = false">×</button>
+      </div>
   </div>
 </template>
 
@@ -82,6 +98,8 @@ export default {
       kecamatanList: [],
       kelurahanList: [],
       rukunWargaList: [],
+      kategoriKumuhList: [],
+      selectedKumuh: [],
 
       selectedKota: null,
       selectedKecamatan: null,
@@ -89,17 +107,20 @@ export default {
       selectedRukunWarga: null,
 
       filteredLayer: null,
-      panelCollapsed: true
+      panelCollapsed: true,
+      alert: { visible: false, text: '', type: 'warning' },
+      _alertTimer: null
     };
   },
   mounted() {
     this.loadKota();
+    this.loadKategoriKumuh();
   },
   methods: {
     togglePanel() {
       this.panelCollapsed = !this.panelCollapsed;
     },
-    
+
     async loadKota() {
       try {
         const res = await fetch(`${apiBase}/api/admin/geojson-kota`);
@@ -170,27 +191,81 @@ export default {
       }
     },
 
+    async loadKategoriKumuh() {
+      try {
+        const res = await fetch(`${apiBase}/api/admin/geojson-kategori-kumuh`);
+        const data = await res.json();
+        this.kategoriKumuhList = data.map((name, i) => ({ id: i + 1, name }));
+      } catch (err) {
+        console.error('Gagal ambil kategori kumuh:', err);
+      }
+    },
+    
+    showAlert(text, type = 'warning', timeout = 3000) {
+      this.alert = { visible: true, text, type };
+      clearTimeout(this._alertTimer);
+      this._alertTimer = setTimeout(() => { this.alert.visible = false; }, timeout);
+    },
+
     async applyFilters() {
-      if (!this.selectedKota?.name) {
-        console.warn('Kota belum dipilih');
+      const hasAdmin = !!this.selectedKota?.name;
+      const hasKumuh = Array.isArray(this.selectedKumuh) && this.selectedKumuh.length > 0;
+
+      if (!hasAdmin && !hasKumuh) {
+        console.warn('Pilih minimal Kota/Kabupaten atau kategori kumuh.', 'warning');
         return;
       };
 
       const params = new URLSearchParams();
 
-      params.append('kota', this.selectedKota?.name || '');
-      if (this.selectedKecamatan?.name) params.append('kecamatan', this.selectedKecamatan.name);
-      if (this.selectedKelurahan?.name) params.append('kelurahan', this.selectedKelurahan.name);
-      if (this.selectedRukunWarga?.name) params.append('rw', this.selectedRukunWarga.name)
+      if (hasAdmin) {
+        params.append('kota', this.selectedKota?.name || '');
+        if (this.selectedKecamatan?.name) params.append('kecamatan', this.selectedKecamatan.name);
+        if (this.selectedKelurahan?.name) params.append('kelurahan', this.selectedKelurahan.name);
+        if (this.selectedRukunWarga?.name) params.append('rw', this.selectedRukunWarga.name)
+      }
+      
+      if (hasKumuh) {
+        this.selectedKumuh.forEach(k => params.append('kategori_kumuh', k));
+      }
 
       try {
-        const res = await fetch(`${apiBase}/api/admin/geojson?${params.toString()}`);
-        const geojson = await res.json();
-        this.zoomToLocation(geojson);
-        this.panelCollapsed = true;
-      } catch (err) {
-        console.error('Gagal apply filter:', err);
+      const res = await fetch(`${apiBase}/api/admin/geojson?${params.toString()}`);
+
+      // Kalau API kamu kadang balikin 204/404
+      if (!res.ok) {
+        this.showAlert('Gagal memuat data (server error).', 'error', 4000);
+        return;
       }
+
+      const geojson = await res.json();
+
+      // Cek valid & ada fitur
+      const noData =
+        !geojson ||
+        geojson.type !== 'FeatureCollection' ||
+        !Array.isArray(geojson.features) ||
+        geojson.features.length === 0;
+
+      if (noData) {
+        // bersihkan layer sebelumnya biar nggak menyesatkan
+        if (this.filteredLayer) {
+          this.map.removeLayer(this.filteredLayer);
+          this.filteredLayer = null;
+        }
+        this.panelCollapsed = false; // biar user bisa ganti filter
+        this.showAlert('Data tidak tersedia untuk filter saat ini.', 'warning');
+        return;
+      }
+
+      // Ada data → lanjut zoom & tutup panel
+      this.zoomToLocation(geojson);
+      this.panelCollapsed = true;
+
+    } catch (err) {
+      console.error('Gagal apply filter:', err);
+      this.showAlert('Terjadi kesalahan koneksi.', 'error', 4000);
+    }
     },
 
     resetFilters() {
@@ -200,6 +275,7 @@ export default {
       this.kecamatanList = [];
       this.kelurahanList = [];
       this.rukunWargaList = [];
+      this.selectedKumuh  = [];
       this.panelCollapsed = true;
 
       if (this.filteredLayer) {
@@ -244,7 +320,7 @@ export default {
         this.filteredLayer = new VectorLayer({
           source,
           style: new Style({
-            stroke: new Stroke({ color: 'red', width: 2 }),
+            stroke: new Stroke({ color: 'orange', width: 2 }),
             fill: new Fill({ color: 'rgba(255, 0, 0, 0.1)' })
           })
         });
@@ -390,6 +466,10 @@ export default {
   background-size: 1rem;
 }
 
+.filter-group select[multiple] {
+  min-height: 140px;
+}
+
 .filter-group select:focus {
   outline: none;
   border-color: var(--primary-color);
@@ -504,4 +584,41 @@ export default {
     transform: translateX(0);
   }
 }
+/* alert */
+.toast {
+  position: absolute;
+  top: 410px;
+  right: 8px;
+  z-index: 1100;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 200px;
+  animation: fadeIn .15s ease-out;
+  font-size: 0.95rem;
+}
+.toast i { opacity: 0.8; }
+.toast.warning { border-color: #f59e0b33; }
+.toast.error   { border-color: #ef444433; }
+
+.toast-close {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 </style>
